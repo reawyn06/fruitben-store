@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6C6A4B6E-9C1A-4A3D-8B2E-1E7C9B2F7A11}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ShopHoaQua</RootNamespace>
+    <AssemblyName>ShopHoaQua</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+    <Use64BitIISExpress />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Gói NuGet dùng PackageReference (VS2019 tự động restore khi mở project) -->
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.9" />
+    <PackageReference Include="Microsoft.AspNet.WebHelpers">
+      <Version>3.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.9" />
+    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
+    <PackageReference Include="Microsoft.Web.Infrastructure" Version="2.0.0" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="3.6.0" />
+    <PackageReference Include="bootstrap" Version="4.6.2" />
+    <PackageReference Include="jQuery" Version="3.7.0" />
+    <PackageReference Include="Antlr" Version="3.5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\Api\SanPhamApiController.cs" />
+    <Compile Include="Controllers\DonHangController.cs" />
+    <Compile Include="Controllers\GioHangController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LienHeController.cs" />
+    <Compile Include="Controllers\SanPhamAdminController.cs" />
+    <Compile Include="Controllers\SanPhamController.cs" />
+    <Compile Include="Controllers\TaiKhoanController.cs" />
+    <Compile Include="Controllers\TinTucController.cs" />
+    <Compile Include="Data\AdoNetHelper.cs" />
+    <Compile Include="Filters\KhoiPhucDangNhapAttribute.cs" />
+    <Compile Include="Filters\QuyenAdminAttribute.cs" />
+    <Compile Include="Filters\ApiQuyenAdminAttribute.cs" />
+    <Compile Include="Helpers\PhienDangNhap.cs" />
+    <Compile Include="Helpers\MatKhauHelper.cs" />
+    <Compile Include="Helpers\UploadAnhHelper.cs" />
+    <Compile Include="Data\ShopHoaQuaContext.cs" />
+    <Compile Include="Controllers\QuanTriController.cs" />
+    <Compile Include="Controllers\DonHangAdminController.cs" />
+    <Compile Include="Controllers\KhachHangAdminController.cs" />
+    <Compile Include="Controllers\MaGiamGiaAdminController.cs" />
+    <Compile Include="Models\MaGiamGia.cs" />
+    <Compile Include="Services\DonHangService.cs" />
+    <Compile Include="Controllers\ThongKeAdoController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DonHang.cs" />
+    <Compile Include="Models\LienHeVaTinTuc.cs" />
+    <Compile Include="Models\SanPham.cs" />
+    <Compile Include="Models\TaiKhoan.cs" />
+    <Compile Include="Models\TrangThaiDonHang.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\img\tintuc\cach-chon-bo-chin.jpg" />
+    <Content Include="assets\img\tintuc\cam-pha-chanh-day.jpg" />
+    <Content Include="assets\img\tintuc\chon-va-so-che-trai-cay.jpg" />
+    <Content Include="assets\img\tintuc\goi-y-bay-dia-dua-luoi.jpg" />
+    <Content Include="assets\img\tintuc\salad-tao-cho-bua-xe.jpg" />
+    <Content Include="assets\img\tintuc\thuc-don-trai-cay-trong-tuan.jpg" />
+    <Content Include="Global.asax" />
+    <Content Include="assets\js\scriptcaroselbanner.js" />
+    <Content Include="Web.config" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\DonHangAdmin\ChiTiet.cshtml" />
+    <Content Include="Views\DonHangAdmin\Index.cshtml" />
+    <Content Include="Views\DonHang\ChiTiet.cshtml" />
+    <Content Include="Views\DonHang\_ThanhToanQR.cshtml" />
+    <Content Include="Views\DonHang\_TomTatDon.cshtml" />
+    <Content Include="Views\Home\DoiTra.cshtml" />
+    <Content Include="Views\Home\ThanhToan.cshtml" />
+    <Content Include="Views\Home\VanChuyen.cshtml" />
+    <Content Include="Views\KhachHangAdmin\Index.cshtml" />
+    <Content Include="Views\MaGiamGiaAdmin\Index.cshtml" />
+    <Content Include="Views\MaGiamGiaAdmin\Sua.cshtml" />
+    <Content Include="Views\MaGiamGiaAdmin\Them.cshtml" />
+    <Content Include="Views\MaGiamGiaAdmin\_FormMaGiamGia.cshtml" />
+    <Content Include="Views\QuanTri\Index.cshtml" />
+    <Content Include="Views\Shared\_TheSanPham.cshtml" />
+    <Content Include="Views\Shared\_TheTinTuc.cshtml" />
+    <Content Include="Views\Shared\_TrangThaiDon.cshtml" />
+    <Content Include="assets\css\site.css" />
+    <Content Include="assets\css\admin.css" />
+    <Content Include="assets\js\site.js" />
+    <Content Include="assets\js\thanhtoan.js" />
+    <Content Include="assets\js\diachi-vn.js" />
+    <Content Include="Views\Shared\_LayoutAdmin.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\SanPhamAdmin\_FormSanPham.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\GioiThieu.cshtml" />
+    <Content Include="Views\Home\Trang404.cshtml" />
+    <Content Include="Views\SanPham\Index.cshtml" />
+    <Content Include="Views\SanPham\ChiTiet.cshtml" />
+    <Content Include="Views\SanPhamAdmin\Index.cshtml" />
+    <Content Include="Views\SanPhamAdmin\Them.cshtml" />
+    <Content Include="Views\SanPhamAdmin\Sua.cshtml" />
+    <Content Include="Views\SanPhamAdmin\Xoa.cshtml" />
+    <Content Include="Views\GioHang\Index.cshtml" />
+    <Content Include="Views\DonHang\ThanhToan.cshtml" />
+    <Content Include="Views\DonHang\DatHangThanhCong.cshtml" />
+    <Content Include="Views\DonHang\LichSu.cshtml" />
+    <Content Include="Views\TaiKhoan\DangNhap.cshtml" />
+    <Content Include="Views\TaiKhoan\DangKy.cshtml" />
+    <Content Include="Views\LienHe\Index.cshtml" />
+    <Content Include="Views\TinTuc\Index.cshtml" />
+    <Content Include="Views\TinTuc\ChiTiet.cshtml" />
+    <Content Include="Views\ThongKeAdo\Index.cshtml" />
+    <Content Include="assets\bootstrap\css\bootstrap-grid.css" />
+    <Content Include="assets\bootstrap\css\bootstrap-grid.css.map" />
+    <Content Include="assets\bootstrap\css\bootstrap-grid.min.css" />
+    <Content Include="assets\bootstrap\css\bootstrap-grid.min.css.map" />
+    <Content Include="assets\bootstrap\css\bootstrap-reboot.css" />
+    <Content Include="assets\bootstrap\css\bootstrap-reboot.css.map" />
+    <Content Include="assets\bootstrap\css\bootstrap-reboot.min.css" />
+    <Content Include="assets\bootstrap\css\bootstrap-reboot.min.css.map" />
+    <Content Include="assets\bootstrap\css\bootstrap.css" />
+    <Content Include="assets\bootstrap\css\bootstrap.css.map" />
+    <Content Include="assets\bootstrap\css\bootstrap.min.css" />
+    <Content Include="assets\bootstrap\css\bootstrap.min.css.map" />
+    <Content Include="assets\bootstrap\js\bootstrap.bundle.js" />
+    <Content Include="assets\bootstrap\js\bootstrap.bundle.js.map" />
+    <Content Include="assets\bootstrap\js\bootstrap.bundle.min.js" />
+    <Content Include="assets\bootstrap\js\bootstrap.bundle.min.js.map" />
+    <Content Include="assets\bootstrap\js\bootstrap.js" />
+    <Content Include="assets\bootstrap\js\bootstrap.js.map" />
+    <Content Include="assets\bootstrap\js\bootstrap.min.js" />
+    <Content Include="assets\bootstrap\js\bootstrap.min.js.map" />
+    <Content Include="assets\css\all.min.css" />
+    <Content Include="assets\css\animate.css" />
+    <Content Include="assets\css\bannercarosel.css" />
+    <Content Include="assets\css\cuahang.css" />
+    <Content Include="assets\css\magnific-popup.css" />
+    <Content Include="assets\css\main.css" />
+    <Content Include="assets\css\meanmenu.min.css" />
+    <Content Include="assets\css\owl.carousel.css" />
+    <Content Include="assets\css\payMoney.css" />
+    <Content Include="assets\css\responsive.css" />
+    <Content Include="assets\css\scss\base\_mixins.scss" />
+    <Content Include="assets\css\scss\base\_typography.scss" />
+    <Content Include="assets\css\scss\base\_variables.scss" />
+    <Content Include="assets\css\scss\common\_common.scss" />
+    <Content Include="assets\css\scss\common\_footer.scss" />
+    <Content Include="assets\css\scss\common\_header.scss" />
+    <Content Include="assets\css\scss\common\_hover.scss" />
+    <Content Include="assets\css\scss\main.scss" />
+    <Content Include="assets\css\scss\pages\_404.css" />
+    <Content Include="assets\css\scss\pages\_404.scss" />
+    <Content Include="assets\css\scss\pages\_about.scss" />
+    <Content Include="assets\css\scss\pages\_contact.scss" />
+    <Content Include="assets\css\scss\pages\_shop.scss" />
+    <Content Include="assets\css\scss\prepros-6.config" />
+    <Content Include="assets\css\scss\sections\_about.scss" />
+    <Content Include="assets\css\scss\sections\_cart-banner.scss" />
+    <Content Include="assets\css\scss\sections\_hero.scss" />
+    <Content Include="assets\css\scss\sections\_list.scss" />
+    <Content Include="assets\css\scss\sections\_news.scss" />
+    <Content Include="assets\css\scss\sections\_shop-banner.scss" />
+    <Content Include="assets\css\scss\sections\_testimonials.scss" />
+    <Content Include="assets\img\1.jpg" />
+    <Content Include="assets\img\a.jpg" />
+    <Content Include="assets\img\abt.jpg" />
+    <Content Include="assets\img\avaters\avatar1.jpg" />
+    <Content Include="assets\img\avaters\avatar2.jpg" />
+    <Content Include="assets\img\avaters\avatar3.jpg" />
+    <Content Include="assets\img\avaters\avatar4.jpg" />
+    <Content Include="assets\img\banner.jpg" />
+    <Content Include="assets\img\banner2.jpg" />
+    <Content Include="assets\img\breadcrumb-bg.jpg" />
+    <Content Include="assets\img\company-logos\1.png" />
+    <Content Include="assets\img\company-logos\2.png" />
+    <Content Include="assets\img\company-logos\3.png" />
+    <Content Include="assets\img\company-logos\4.png" />
+    <Content Include="assets\img\company-logos\5.png" />
+    <Content Include="assets\img\dd.jpg" />
+    <Content Include="assets\img\favicon.png" />
+    <Content Include="assets\img\feature-bg.jpg" />
+    <Content Include="assets\img\hero-bg-2.jpg" />
+    <Content Include="assets\img\hero-bg-3.jpg" />
+    <Content Include="assets\img\hero-bg.jpg" />
+    <Content Include="assets\img\homepage-bg-pattern.png" />
+    <Content Include="assets\img\latest-news\news-bg-1.jpg" />
+    <Content Include="assets\img\latest-news\news-bg-2.jpg" />
+    <Content Include="assets\img\latest-news\news-bg-3.jpg" />
+    <Content Include="assets\img\latest-news\news-bg-4.jpg" />
+    <Content Include="assets\img\latest-news\news-bg-5.jpg" />
+    <Content Include="assets\img\latest-news\news-bg-6.jpg" />
+    <Content Include="assets\img\logo-fruitben.svg" />
+    <Content Include="assets\img\logo.png" />
+    <Content Include="assets\img\products\bo-sap.jpg" />
+    <Content Include="assets\img\products\buoi-da-xanh.jpg" />
+    <Content Include="assets\img\products\cam-sanh.jpg" />
+    <Content Include="assets\img\products\cam-vang-navel-uc.jpg" />
+    <Content Include="assets\img\products\cha-la-tuoi-thai-lan.jpg" />
+    <Content Include="assets\img\products\chanh-vang-trung.jpg" />
+    <Content Include="assets\img\products\chanh.jpg" />
+    <Content Include="assets\img\products\chom-chom.jpg" />
+    <Content Include="assets\img\products\chuoi.jpg" />
+    <Content Include="assets\img\products\dao-nhat-ban.jpg" />
+    <Content Include="assets\img\products\dau-tay-my.jpg" />
+    <Content Include="assets\img\products\dau-tay.jpg" />
+    <Content Include="assets\img\products\du-du.jpg" />
+    <Content Include="assets\img\products\dua-hau.jpg" />
+    <Content Include="assets\img\products\dua-luoi-huu-co.jpg" />
+    <Content Include="assets\img\products\dua-xiem.jpg" />
+    <Content Include="assets\img\products\dua.jpg" />
+    <Content Include="assets\img\products\hong-nhat.jpg" />
+    <Content Include="assets\img\products\hong-tao-noi-dia-trung.jpg" />
+    <Content Include="assets\img\products\hong.jpg" />
+    <Content Include="assets\img\products\kiwi-vang-nz-xl.jpg" />
+    <Content Include="assets\img\products\kiwi.jpg" />
+    <Content Include="assets\img\products\le-nau-noi-dia-trung.jpg" />
+    <Content Include="assets\img\products\le-xanh-premium-my.jpg" />
+    <Content Include="assets\img\products\luu-thai-lan.jpg" />
+    <Content Include="assets\img\products\mam-xoi-den.jpg" />
+    <Content Include="assets\img\products\mam-xoi.jpg" />
+    <Content Include="assets\img\products\man.jpg" />
+    <Content Include="assets\img\products\mang-cut.jpg" />
+    <Content Include="assets\img\products\mit-ruot-do.jpg" />
+    <Content Include="assets\img\products\nhan.jpg" />
+    <Content Include="assets\img\products\nho-den-noi-dia-trung.jpg" />
+    <Content Include="assets\img\products\nho-den.jpg" />
+    <Content Include="assets\img\products\nho-do-crimson.jpg" />
+    <Content Include="assets\img\products\nho-mau-don-noi-dia-trung.jpg" />
+    <Content Include="assets\img\products\nho-red-ruby-han.jpg" />
+    <Content Include="assets\img\products\nho-xanh-sweet-globe-my.jpg" />
+    <Content Include="assets\img\products\oi.jpg" />
+    <Content Include="assets\img\products\oiruotdo.jpg" />
+    <Content Include="assets\img\products\sau-rieng.jpg" />
+    <Content Include="assets\img\products\tao-braeburn-nz.jpg" />
+    <Content Include="assets\img\products\tao-cherry-mini.jpg" />
+    <Content Include="assets\img\products\tao-envy-nz.jpg" />
+    <Content Include="assets\img\products\tao-fuji.jpg" />
+    <Content Include="assets\img\products\tao-sekai-ichi-nhat-ban.jpg" />
+    <Content Include="assets\img\products\tao-shinamo-gold.jpg" />
+    <Content Include="assets\img\products\tao-vang-kinsei.jpg" />
+    <Content Include="assets\img\products\tao-xanh.jpg" />
+    <Content Include="assets\img\products\thanh-long-ruot-do.jpg" />
+    <Content Include="assets\img\products\thanh-long-ruot-trang.jpg" />
+    <Content Include="assets\img\products\vai-thieu.jpg" />
+    <Content Include="assets\img\products\viet-quat-uc.jpg" />
+    <Content Include="assets\img\products\xoai-cat.jpg" />
+    <Content Include="assets\img\team\team-1.jpg" />
+    <Content Include="assets\img\team\team-2.jpg" />
+    <Content Include="assets\img\team\team-3.jpg" />
+    <Content Include="assets\img\team\team-4.jpg" />
+    <Content Include="assets\js\dangkynhantin.js" />
+    <Content Include="assets\js\jquery.validate.min.js" />
+    <Content Include="assets\js\jquery.validate.messages_vi.min.js" />
+    <Content Include="assets\js\jquery.validate.unobtrusive.min.js" />
+    <Content Include="assets\js\form-validate.js" />
+    <Content Include="assets\js\jquery-1.11.3.min.js" />
+    <Content Include="assets\js\jquery.countdown.js" />
+    <Content Include="assets\js\jquery.isotope-3.0.6.min.js" />
+    <Content Include="assets\js\jquery.magnific-popup.min.js" />
+    <Content Include="assets\js\jquery.meanmenu.min.js" />
+    <Content Include="assets\js\main.js" />
+    <Content Include="assets\js\owl.carousel.min.js" />
+    <Content Include="assets\js\scriptcaroselbanner.js" />
+    <Content Include="assets\js\sticker.js" />
+    <Content Include="assets\js\waypoints.js" />
+    <Content Include="assets\webfonts\fa-brands-400.eot" />
+    <Content Include="assets\webfonts\fa-brands-400.eot_" />
+    <Content Include="assets\webfonts\fa-brands-400.svg" />
+    <Content Include="assets\webfonts\fa-brands-400.ttf" />
+    <Content Include="assets\webfonts\fa-brands-400.woff" />
+    <Content Include="assets\webfonts\fa-brands-400.woff2" />
+    <Content Include="assets\webfonts\fa-regular-400.eot" />
+    <Content Include="assets\webfonts\fa-regular-400.eot_" />
+    <Content Include="assets\webfonts\fa-regular-400.svg" />
+    <Content Include="assets\webfonts\fa-regular-400.ttf" />
+    <Content Include="assets\webfonts\fa-regular-400.woff" />
+    <Content Include="assets\webfonts\fa-regular-400.woff2" />
+    <Content Include="assets\webfonts\fa-solid-900.eot" />
+    <Content Include="assets\webfonts\fa-solid-900.eot_" />
+    <Content Include="assets\webfonts\fa-solid-900.svg" />
+    <Content Include="assets\webfonts\fa-solid-900.ttf" />
+    <Content Include="assets\webfonts\fa-solid-900.woff" />
+    <Content Include="assets\webfonts\fa-solid-900.woff2" />
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:44399/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <ItemGroup>
+    <Compile Include="Controllers\TinTucAdminController.cs" />
+    <Content Include="Views\TinTucAdmin\Index.cshtml" />
+    <Content Include="Views\TinTucAdmin\Sua.cshtml" />
+    <Content Include="Views\TinTucAdmin\Them.cshtml" />
+    <Content Include="Views\TinTucAdmin\Xoa.cshtml" />
+    <Content Include="Views\TinTucAdmin\_FormTinTuc.cshtml" />
+  </ItemGroup>
+</Project>

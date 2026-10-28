@@ -1,0 +1,44 @@
+@model ShopHoaQua.Models.DonHang
+<div class="fb-box-head">
+    <h3>Đơn @Model.MaHienThi</h3>
+    @Html.Partial("_TrangThaiDon", Model.TrangThai)
+</div>
+
+@foreach (var ct in Model.ChiTietDonHangs)
+{
+    <div class="fb-order-line">
+        <img src="~/assets/img/products/@(ct.SanPham != null ? ct.SanPham.HinhAnh : "")" alt="" />
+        <div><b>@(ct.SanPham != null ? ct.SanPham.TenSanPham : "Sản phẩm #" + ct.SanPhamId)</b><small>@ct.SoLuong kg × @ct.DonGia.ToString("#,##0")đ</small></div>
+        <span class="font-weight-bold fb-num">@ct.ThanhTien.ToString("#,##0")đ</span>
+    </div>
+}
+
+<div class="mt-3">
+    <div class="fb-sum-row"><span>Tạm tính</span><span>@Model.TamTinh.ToString("#,##0")đ</span></div>
+    <div class="fb-sum-row"><span>Phí vận chuyển</span><span>@(Model.PhiVanChuyen == 0 ? "Miễn phí" : Model.PhiVanChuyen.ToString("#,##0") + "đ")</span></div>
+    @if (Model.GiamGia > 0)
+    {
+        <div class="fb-sum-row giam"><span>Giảm giá @(string.IsNullOrEmpty(Model.MaGiamGiaApDung) ? "" : "(" + Model.MaGiamGiaApDung + ")")</span><span>-@Model.GiamGia.ToString("#,##0")đ</span></div>
+    }
+    <div class="fb-sum-total"><span class="font-weight-bold">Tổng thanh toán</span><strong>@Model.TongTien.ToString("#,##0")đ</strong></div>
+</div>
+
+<div class="fb-note-box mt-3">
+    <div class="mb-1"><b><i class="fas fa-map-marker-alt"></i> Giao đến</b></div>
+    @Model.HoTenNguoiNhan · @Model.SoDienThoai<br />
+    @Model.DiaChiDayDu
+    @if (!string.IsNullOrWhiteSpace(Model.GhiChu))
+    {
+        <div class="mt-1"><i>Ghi chú: @Model.GhiChu</i></div>
+    }
+    <div class="mt-2"><b><i class="fas fa-wallet"></i> Thanh toán:</b> @Model.TenPhuongThucThanhToan
+        @if (Model.DaThanhToan)
+        {
+            <span class="fb-pill ok ml-1">Đã thanh toán</span>
+        }
+        else if (Model.TrangThai != ShopHoaQua.Models.TrangThaiDonHang.DaHuy)
+        {
+            <span class="fb-pill warn ml-1">Chưa thanh toán</span>
+        }
+    </div>
+</div>

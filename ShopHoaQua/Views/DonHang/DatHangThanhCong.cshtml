@@ -1,0 +1,50 @@
+@model ShopHoaQua.Models.DonHang
+@using ShopHoaQua.Models
+@{
+    ViewBag.TieuDeTrang = "Đặt hàng thành công";
+    ViewBag.Banner = "Cảm ơn bạn";
+    ViewBag.BannerTieuDe = "Đặt hàng thành công";
+    var canChuyenKhoan = Model.PhuongThucThanhToan == PhuongThucThanhToan.QR && !Model.DaThanhToan && Model.TrangThai != TrangThaiDonHang.DaHuy;
+}
+
+<div class="fb-steps">
+    <div class="fb-step xong"><span class="so"><i class="fas fa-check"></i></span><div><strong>Giỏ hàng</strong><small>Đã chọn sản phẩm</small></div></div>
+    <div class="fb-step xong"><span class="so"><i class="fas fa-check"></i></span><div><strong>Thông tin</strong><small>Đã nhập giao hàng</small></div></div>
+    <div class="fb-step hien-tai"><span class="so">3</span><div><strong>Hoàn tất</strong><small>Đơn đã được ghi nhận</small></div></div>
+</div>
+
+<div class="fb-checkout">
+    <div style="min-width: 0;">
+        <section class="fb-card fb-card-pad text-center">
+            <span class="fb-success-icon"><i class="fas fa-check"></i></span>
+            <h1 class="mt-3 mb-2" style="font-size: clamp(1.6rem, 3vw, 2.2rem);">Cảm ơn @Model.HoTenNguoiNhan!</h1>
+            <p class="text-muted mb-1">Đơn <b style="color: var(--fb-green-dark);">@Model.MaHienThi</b> đã được ghi nhận lúc @Model.NgayDat.ToString("HH:mm dd/MM/yyyy").</p>
+            <p class="text-muted">
+                @if (canChuyenKhoan)
+                {
+                    @:Vui lòng quét mã QR bên dưới để hoàn tất thanh toán.
+                }
+                else
+                {
+                    @:FruitBen sẽ gọi số <b>@Model.SoDienThoai</b> để xác nhận và giao hàng sớm nhất.
+                }
+            </p>
+            <div class="d-flex justify-content-center flex-wrap mt-3" style="gap: 10px;">
+                @if (Model.TaiKhoanId.HasValue)
+                {
+                    <a class="fb-btn fb-btn-grad" href="@Url.Action("ChiTiet", "DonHang", new { id = Model.DonHangId })"><i class="fas fa-receipt"></i> Theo dõi đơn hàng</a>
+                }
+                <a class="fb-btn fb-btn-soft" href="@Url.Action("Index", "SanPham")">Tiếp tục mua sắm</a>
+            </div>
+        </section>
+
+        @if (canChuyenKhoan)
+        {
+            @Html.Partial("_ThanhToanQR", Model)
+        }
+    </div>
+
+    <aside class="fb-card fb-card-pad fb-sticky">
+        @Html.Partial("_TomTatDon", Model)
+    </aside>
+</div>

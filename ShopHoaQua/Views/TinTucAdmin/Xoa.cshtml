@@ -1,0 +1,16 @@
+﻿@model ShopHoaQua.Models.TinTuc
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewBag.TieuDeTrang = "Xóa tin tức";
+}
+<div class="ad-head"><h1>Xóa tin tức</h1></div>
+<div class="fb-card fb-card-pad">
+    <p>Bạn có chắc muốn xóa bài viết <strong>@Model.TieuDe</strong>?</p>
+    <p>Bài viết sẽ không còn hiển thị trên cửa hàng. Thao tác này không thể hoàn tác.</p>
+    @using (Html.BeginForm("Xoa", "TinTucAdmin", new { id = Model.TinTucId }, FormMethod.Post, null))
+    {
+        @Html.AntiForgeryToken()
+        <a class="fb-btn fb-btn-outline" href="@Url.Action("Index")">Hủy bỏ</a>
+        <button type="submit" class="fb-btn fb-btn-danger">Xác nhận xóa</button>
+    }
+</div>

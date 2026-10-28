@@ -1,0 +1,23 @@
+@model ShopHoaQua.Models.TinTuc
+@* Partial View: 1 thẻ tin tức (Trang chủ, trang Tin tức). *@
+<a class="fb-news-card" href="@Url.Action("ChiTiet", "TinTuc", new { id = Model.TinTucId })">
+    <div class="fb-news-img">
+        @if (!string.IsNullOrEmpty(Model.HinhAnh))
+        {
+            <img src="~/assets/img/tintuc/@Model.HinhAnh" alt="@Model.TieuDe" loading="lazy" />
+        }
+        else
+        {
+            <i class="fas fa-lemon"></i>
+        }
+    </div>
+    <div class="fb-news-body">
+        <div class="fb-news-meta">
+            <span><i class="far fa-calendar-alt"></i> @Model.NgayDang.ToString("dd/MM/yyyy")</span>
+            <span><i class="far fa-user"></i> @Model.NguoiDang</span>
+        </div>
+        <h3>@Model.TieuDe</h3>
+        <p>@Model.TomTat</p>
+        <span class="fb-more">Đọc tiếp <i class="fas fa-arrow-right"></i></span>
+    </div>
+</a>

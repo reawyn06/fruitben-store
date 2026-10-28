@@ -1,0 +1,24 @@
+@model ShopHoaQua.Models.MaGiamGia
+@{
+    ViewBag.TieuDeTrang = "Tạo mã giảm giá";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="ad-head">
+    <div>
+        <a href="@Url.Action("Index")" class="text-muted" style="font-size: .88rem;"><i class="fas fa-arrow-left"></i> Mã giảm giá</a>
+        <h1>Tạo mã giảm giá</h1>
+        <p>Mã có hiệu lực ngay khi bật, trong khoảng ngày đã đặt.</p>
+    </div>
+</div>
+
+@using (Html.BeginForm("Them", "MaGiamGiaAdmin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "fb-error mb-3" })
+    @Html.Partial("_FormMaGiamGia", Model)
+    <div class="ad-form-actions">
+        <a class="fb-btn fb-btn-outline" href="@Url.Action("Index")">Huỷ bỏ</a>
+        <button type="submit" class="fb-btn fb-btn-grad"><i class="fas fa-plus"></i> Tạo mã</button>
+    </div>
+}

@@ -1,0 +1,46 @@
+@model ShopHoaQua.Models.DonHang
+@using ShopHoaQua.Services
+@*
+    Partial View: khối chuyển khoản QR (VietQR) cho đơn chọn thanh toán QR và chưa thanh toán.
+    Ảnh QR đã chứa sẵn số tiền + nội dung chuyển khoản; thông tin tài khoản cấu hình trong Web.config.
+    Đếm ngược tính từ giờ đặt đơn (QrThanhToan.SO_PHUT_HIEU_LUC phút).
+*@
+@{
+    var hetHanLuc = Model.NgayDat.AddMinutes(QrThanhToan.SO_PHUT_HIEU_LUC);
+    var conGiay = (int)Math.Max(0, (hetHanLuc - DateTime.Now).TotalSeconds);
+}
+<section class="fb-card fb-card-pad mt-4" id="khoiQR">
+    <div class="fb-box-head">
+        <h3><i class="fas fa-qrcode" style="color: var(--fb-green);"></i> Quét mã để chuyển khoản</h3>
+        <span class="fb-timer" data-con-giay="@conGiay"><i class="far fa-clock"></i> <span>--:--</span></span>
+    </div>
+    <div class="fb-qr">
+        <img src="@QrThanhToan.TaoLinkAnh(Model.TongTien, Model.NoiDungChuyenKhoan)" alt="Mã QR chuyển khoản @Model.TongTien.ToString("#,##0")đ" />
+        <div>
+            <dl>
+                <dt>Ngân hàng</dt><dd>@QrThanhToan.TenNganHang</dd>
+                <dt>Số tài khoản</dt><dd>@QrThanhToan.SoTaiKhoan <button type="button" class="fb-copy" data-copy="@QrThanhToan.SoTaiKhoan">Chép</button></dd>
+                <dt>Chủ tài khoản</dt><dd>@QrThanhToan.TenTaiKhoan</dd>
+                <dt>Số tiền</dt><dd class="fb-price">@Model.TongTien.ToString("#,##0")đ</dd>
+                <dt>Nội dung</dt><dd>@Model.NoiDungChuyenKhoan <button type="button" class="fb-copy" data-copy="@Model.NoiDungChuyenKhoan">Chép</button></dd>
+            </dl>
+            <p class="text-muted mt-3 mb-0" style="font-size: .82rem;">
+                Ghi đúng nội dung để FruitBen tự đối soát. Sau khi nhận được tiền, cửa hàng xác nhận và chuyển đơn sang “Đang giao”.
+                Quá @QrThanhToan.SO_PHUT_HIEU_LUC phút chưa chuyển khoản, bạn vẫn có thể chuyển hoặc gọi 1900 1234 để đổi sang COD.
+            </p>
+        </div>
+    </div>
+</section>
+<script>
+    (function () {
+        var el = document.querySelector("#khoiQR .fb-timer");
+        if (!el) return;
+        var giay = parseInt(el.getAttribute("data-con-giay"), 10), span = el.querySelector("span");
+        function ve() {
+            if (giay <= 0) { span.textContent = "Đã quá thời gian giữ đơn"; return; }
+            span.textContent = String(Math.floor(giay / 60)).padStart(2, "0") + ":" + String(giay % 60).padStart(2, "0");
+            giay--; setTimeout(ve, 1000);
+        }
+        ve();
+    })();
+</script>

@@ -1,0 +1,29 @@
+﻿@model ShopHoaQua.Models.TinTuc
+<div class="fb-card fb-card-pad">
+    <div class="fb-field">
+        @Html.LabelFor(m => m.TieuDe)
+        @Html.TextBoxFor(m => m.TieuDe, new { @class = "form-control", maxlength = "200", required = "required" })
+        @Html.ValidationMessageFor(m => m.TieuDe, "", new { @class = "fb-error" })
+    </div>
+    <div class="fb-field">
+        @Html.LabelFor(m => m.TomTat)
+        @Html.TextAreaFor(m => m.TomTat, new { @class = "form-control", rows = "3" })
+        @Html.ValidationMessageFor(m => m.TomTat, "", new { @class = "fb-error" })
+    </div>
+    <div class="fb-field">
+        @Html.LabelFor(m => m.NoiDung)
+        @Html.TextAreaFor(m => m.NoiDung, new { @class = "form-control", rows = "12", required = "required" })
+        @Html.ValidationMessageFor(m => m.NoiDung, "", new { @class = "fb-error" })
+        <small class="text-muted">Nhập văn bản và xuống dòng để chia đoạn.</small>
+    </div>
+    <div class="fb-field">
+        <label for="fileHinhAnh">Ảnh đại diện</label>
+        @if (!string.IsNullOrEmpty(Model.HinhAnh))
+        {
+            <div class="mb-2"><img src="@Url.Content("~/assets/img/tintuc/" + Model.HinhAnh)" alt="Ảnh hiện tại" style="max-width:240px;max-height:160px;object-fit:cover;" /></div>
+        }
+        <input type="file" id="fileHinhAnh" name="fileHinhAnh" class="form-control-file" accept=".jpg,.jpeg,.png,.webp,.gif" />
+        @Html.ValidationMessage("fileHinhAnh", "", new { @class = "fb-error" })
+        <small class="text-muted">JPG, JPEG, PNG, WEBP hoặc GIF; tối đa 2 MB. Khi sửa, để trống để giữ ảnh cũ.</small>
+    </div>
+</div>

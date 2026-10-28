@@ -1,0 +1,54 @@
+@model ShopHoaQua.Models.DangNhapViewModel
+@{
+    ViewBag.TieuDeTrang = "Đăng nhập";
+    ViewBag.Banner = "Chào mừng trở lại";          // banner đầu trang (giao diện mẫu Fruitkha)
+    ViewBag.BannerTieuDe = "Đăng nhập vào tài khoản";
+}
+
+<section class="fb-card fb-auth">
+    <div class="fb-auth-side" style="background-image: url('@Url.Content("~/assets/img/hero-bg-2.jpg")');">
+        <span class="fb-eyebrow">Thành viên FruitBen</span>
+        <h2>Chào mừng bạn quay lại</h2>
+        <p>Đăng nhập để theo dõi đơn hàng, tự điền địa chỉ giao hàng và nhận mã giảm giá dành riêng cho bạn.</p>
+    </div>
+
+    <div class="fb-auth-form">
+        <span class="fb-eyebrow"><i class="fas fa-lock"></i> Đăng nhập</span>
+        <h1>Đăng nhập tài khoản</h1>
+        <p class="text-muted">Chưa có tài khoản? <a href="@Url.Action("DangKy")" class="font-weight-bold">Đăng ký ngay</a></p>
+
+        @using (Html.BeginForm("DangNhap", "TaiKhoan", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "fb-note-box mb-3", style = "background: var(--fb-red-soft); border-color: #f7caca; color: var(--fb-red); font-weight: 600;" })
+
+            <div class="fb-field">
+                @Html.LabelFor(m => m.Email)
+                <div class="fb-input-icon"><i class="far fa-envelope"></i>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "fb-control", placeholder = "ban@gmail.com", type = "email", autocomplete = "username", autofocus = "autofocus" })
+                </div>
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+
+            <div class="fb-field">
+                @Html.LabelFor(m => m.MatKhau)
+                <div class="fb-input-icon" style="position: relative;"><i class="fas fa-lock"></i>
+                    @Html.PasswordFor(m => m.MatKhau, new { @class = "fb-control", placeholder = "Mật khẩu", autocomplete = "current-password" })
+                    <button type="button" class="fb-pass-toggle" data-toggle-pass="MatKhau" aria-label="Hiện mật khẩu"><i class="far fa-eye"></i></button>
+                </div>
+                @Html.ValidationMessageFor(m => m.MatKhau)
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap" style="gap: 8px;">
+                <label class="fb-check" for="GhiNho">
+                    @Html.CheckBoxFor(m => m.GhiNho) Ghi nhớ đăng nhập 30 ngày
+                </label>
+            </div>
+
+            <button type="submit" class="fb-btn fb-btn-grad fb-btn-lg fb-btn-block">Đăng nhập <i class="fas fa-arrow-right"></i></button>
+
+            <div class="fb-divider">hoặc</div>
+            <a class="fb-btn fb-btn-soft fb-btn-block" href="@Url.Action("Index", "SanPham")">Mua hàng không cần tài khoản</a>
+        }
+    </div>
+</section>

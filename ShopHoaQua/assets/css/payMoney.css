@@ -1,0 +1,355 @@
+*{
+    box-sizing: border-box;
+}
+
+.wide {
+    margin: 0 12px;
+}
+.name-store {
+    font-size: 30px;
+    margin: 30px 0 10px 0;
+}
+
+.name-store a {
+    color: #F28123;
+    text-decoration: none;
+    transition: color 0.2s linear;
+}
+
+.name-store a:hover {
+    color: black;
+    transition: color 0.2s linear;
+}
+
+.Pay,
+.transport-header,
+.header-Delivery-info {
+    margin: 18px 0;
+    font-size: 22px;
+    line-height: 1.4; 
+    font-weight: bold;
+}
+
+.fieldset {
+    width: 100%;
+}
+
+.field {
+    width: 100%;
+}
+
+.field input {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    outline: none;
+    border: 1px solid ;
+    border-radius: 4px;
+}
+
+.field input:focus {
+    border: 1px solid rgb(90, 90, 255);
+}
+
+#province {
+    position: relative;
+    width: 100%;
+    padding: 12px 10px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+}
+
+#district {
+    width: 100%;
+    padding: 12px 10px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+}
+
+#note {
+    max-width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    outline: none;
+    border: 1px solid ;
+    border-radius: 4px;
+}
+
+.Pay-content,
+.transport-fee {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 20px 10px;
+    border-radius: 4px;
+}
+
+.radio-icon {
+    margin-right: 4px;
+    color: #337ab7;
+}
+
+#pay-cod {
+    margin-right: 8px;
+    font-size: 16px;
+    color: #337ab7;
+}
+
+.Pay-text-icon {
+    font-size: 18px;
+    color: #337ab7;
+}
+
+.product-content {
+    background-color: #fafafa;
+    border-left: 1px solid rgb(105 105 105 / 45%);
+    height: 100vh;
+}
+
+.header-product {
+    font-size: 22px;
+    line-height: 1.4;
+    margin: 20px 0 10px 0;
+    padding: 0 0 10px 10px;
+    font-weight: bold;
+    border-bottom: 1px solid rgb(105 105 105 / 45%);
+}
+
+.product {
+    overflow-y: auto;
+    height: calc(100vh - 480px);
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.product-item-img {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.product-item-img img {
+    width: 60px;
+    height: auto;
+    margin-right: 20px;
+}
+
+.product-quantity {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #2a9dcc;
+    padding: 4px 8px;
+    color: white;
+    border-radius: 50%;
+}
+
+.discount-code {
+    display: flex;
+    padding: 10px;
+    width: 100%;
+    border-top: 1px solid rgb(105 105 105 / 45%);
+    justify-content: space-between;
+}
+
+.discount-code-input {
+    width: 70%;
+    display: inline-block;
+    padding: 7px 16px;
+    margin-bottom: 10px;
+    outline: none;
+    border: 1px solid ;
+    border-radius: 4px;
+}
+
+.btn-discount {
+    display: inline-block;
+    width: 30%;
+    height: 41px;
+    background-color: #F28123;
+    color: white;
+}
+
+.Provisional {
+    border-top: 1px solid rgb(105 105 105 / 45%);
+    padding: 20px 10px;
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.671);
+}
+
+.Provisional-shipping,
+.Provisionall-product {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.total {
+    font-size: 20px;
+    border-top: 1px solid rgb(105 105 105 / 45%);
+    padding: 20px 0 174px 0;
+}
+
+.total-price {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-submit {
+    float: right;
+    margin-top: 10px;
+    font-size: 18px;
+    background-color: #F28123;
+    color: white;
+    padding: 8px 14px;
+}
+
+.field-district,
+.field-province {
+    position: relative;
+}
+
+#district-list,
+#province-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+}
+
+#district-list li,
+#province-list li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#district-list li:hover,
+#province-list li:hover {
+    background-color: #f0f0f0;
+}
+
+.hidden {
+    display: none;
+}
+
+#pay-bank,
+.disable {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.pay-bannk-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.pay-bank-back-ground {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    content: "";
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.pay-bannk-content {
+    width: 800px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 4px;
+    position: relative;
+    z-index: 10;
+}
+
+.pay-bannk-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 35px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.pay-bannk-content input {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    outline: none;
+    border: 1px solid ;
+    border-radius: 4px;
+}
+
+#pay-bank-check:checked ~ .pay-bannk-container {
+    display: flex;
+}
+
+#pay-bank-check {
+    display: none;
+}
+
+.header-pay-bank {
+    font-size: 22px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.pay-bannk-total {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.btn-pay-bannk {
+    display: block;
+    width: 100%;
+    height: 41px;
+    background-color: #2a9dcc;
+    color: white;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.checkout__link #info-default{
+    display: block;
+    width: auto;
+    height: 40px;
+    line-height: 20px;
+    text-align: center;
+    background-color: #F28123;
+    padding: 10px 10px;
+    color: #000;
+}
+
+.checkout__link #info-input {
+    display: block;
+    width: auto;
+    height: 40px;
+    line-height: 20px;
+    text-align: center;
+    background-color: #F28123;
+    padding: 10px 10px;
+    color: #000;
+}

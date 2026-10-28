@@ -1,0 +1,121 @@
+@model ShopHoaQua.Controllers.LocDonHangViewModel
+@using ShopHoaQua.Models
+@using ShopHoaQua.Services
+@{
+    ViewBag.TieuDeTrang = "Đơn hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var tong = Model.DemTheoTrangThai.Values.Sum();
+    var quayVe = Request.RawUrl;
+}
+
+<div class="ad-head">
+    <div>
+        <span class="fb-eyebrow">Bán hàng</span>
+        <h1>Quản lý đơn hàng</h1>
+        <p>@(Model.TenKhachHang != null ? "Đơn của khách " + Model.TenKhachHang : "Lọc theo trạng thái, tìm theo mã đơn, tên hoặc số điện thoại.")</p>
+    </div>
+    @if (Model.TaiKhoanId.HasValue)
+    {
+        <a class="fb-btn fb-btn-soft" href="@Url.Action("Index")"><i class="fas fa-times"></i> Bỏ lọc khách hàng</a>
+    }
+</div>
+
+<section class="ad-panel">
+    <div class="ad-tabs">
+        <a class="fb-chip @(string.IsNullOrEmpty(Model.TrangThai) ? "active" : "")" href="@Url.Action("Index", new { tuKhoa = Model.TuKhoa, taiKhoanId = Model.TaiKhoanId })">Tất cả <span class="fb-chip-count">@tong</span></a>
+        @foreach (var tt in TrangThaiDonHang.TatCa)
+        {
+            <a class="fb-chip @(tt == Model.TrangThai ? "active" : "")" href="@Url.Action("Index", new { trangThai = tt, tuKhoa = Model.TuKhoa, taiKhoanId = Model.TaiKhoanId })">@tt <span class="fb-chip-count">@(Model.DemTheoTrangThai.ContainsKey(tt) ? Model.DemTheoTrangThai[tt] : 0)</span></a>
+        }
+    </div>
+
+    <form class="ad-filter-bar" method="get" action="@Url.Action("Index")">
+        <input type="hidden" name="trangThai" value="@Model.TrangThai" />
+        @if (Model.TaiKhoanId.HasValue)
+        {
+            <input type="hidden" name="taiKhoanId" value="@Model.TaiKhoanId" />
+        }
+        <input type="search" class="fb-control" name="tuKhoa" value="@Model.TuKhoa" placeholder="Mã đơn (FB00012), tên hoặc số điện thoại..." aria-label="Tìm đơn hàng" />
+        <button type="submit" class="fb-btn fb-btn-grad"><i class="fas fa-search"></i> Tìm</button>
+    </form>
+
+    @if (!Model.DanhSach.Any())
+    {
+        <div class="ad-empty"><i class="fas fa-receipt fa-2x mb-2" style="color: var(--fb-green);"></i><br />Không có đơn hàng nào phù hợp.</div>
+    }
+    else
+    {
+        <div class="ad-table-wrap">
+            <table class="ad-table">
+                <thead>
+                    <tr><th>Mã đơn</th><th>Khách hàng</th><th>Ngày đặt</th><th class="num">SL</th><th class="num">Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var dh in Model.DanhSach)
+                    {
+                        var tiepTheo = DonHangService.TrangThaiTiepTheo(dh.TrangThai).Where(t => t != TrangThaiDonHang.DaHuy).ToArray();
+                        <tr>
+                            <td><a class="font-weight-bold" href="@Url.Action("ChiTiet", new { id = dh.DonHangId })">@dh.MaHienThi</a></td>
+                            <td>
+                                <b>@dh.HoTenNguoiNhan</b><br />
+                                <small class="text-muted">@dh.SoDienThoai@(string.IsNullOrEmpty(dh.TinhThanh) ? "" : " · " + dh.TinhThanh)</small>
+                            </td>
+                            <td><small>@dh.NgayDat.ToString("HH:mm")<br />@dh.NgayDat.ToString("dd/MM/yyyy")</small></td>
+                            <td class="num">@dh.ChiTietDonHangs.Sum(c => c.SoLuong) kg</td>
+                            <td class="num font-weight-bold">@dh.TongTien.ToString("#,##0")đ</td>
+                            <td>
+                                <small>@(dh.PhuongThucThanhToan == PhuongThucThanhToan.QR ? "QR" : "COD")</small><br />
+                                @if (dh.DaThanhToan)
+                                {
+                                    <span class="fb-pill ok">Đã trả</span>
+                                }
+                                else if (dh.TrangThai != TrangThaiDonHang.DaHuy)
+                                {
+                                    <span class="fb-pill warn">Chưa trả</span>
+                                }
+                            </td>
+                            <td>@Html.Partial("_TrangThaiDon", dh.TrangThai)</td>
+                            <td>
+                                <div class="ad-actions">
+                                    @foreach (var tt in tiepTheo)
+                                    {
+                                        using (Html.BeginForm("DoiTrangThai", "DonHangAdmin", FormMethod.Post, new { @class = "m-0" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@dh.DonHangId" />
+                                            <input type="hidden" name="trangThaiMoi" value="@tt" />
+                                            <input type="hidden" name="quayVe" value="@quayVe" />
+                                            <button type="submit" class="fb-btn fb-btn-soft fb-btn-sm" title="Chuyển sang @tt">
+                                                <i class="fas @(tt == TrangThaiDonHang.DangGiao ? "fa-truck" : "fa-check")"></i> @tt
+                                            </button>
+                                        }
+                                    }
+                                    <a class="ad-icon-btn" href="@Url.Action("ChiTiet", new { id = dh.DonHangId })" title="Xem chi tiết" aria-label="Xem chi tiết @dh.MaHienThi"><i class="fas fa-eye"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        if (Model.TongSoTrang > 1)
+        {
+            <ul class="fb-pagination">
+                @for (int i = 1; i <= Model.TongSoTrang; i++)
+                {
+                    <li class="@(i == Model.Trang ? "active" : "")">
+                        @if (i == Model.Trang)
+                        {
+                            <span>@i</span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", new { trangThai = Model.TrangThai, tuKhoa = Model.TuKhoa, taiKhoanId = Model.TaiKhoanId, trang = i })">@i</a>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    }
+</section>

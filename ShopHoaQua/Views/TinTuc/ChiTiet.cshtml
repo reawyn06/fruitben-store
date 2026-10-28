@@ -1,0 +1,38 @@
+@model ShopHoaQua.Models.TinTuc
+@{
+    ViewBag.TieuDeTrang = Model.TieuDe;
+    ViewBag.Banner = "Đọc tin tức";          // banner đầu trang (giao diện mẫu Fruitkha)
+    ViewBag.BannerTieuDe = "Chi tiết tin tức";
+}
+
+<nav class="fb-breadcrumb" aria-label="Đường dẫn">
+    <a href="@Url.Action("Index", "Home")">Trang chủ</a> <i class="fas fa-chevron-right"></i>
+    <a href="@Url.Action("Index", "TinTuc")">Tin tức</a> <i class="fas fa-chevron-right"></i>
+    <span class="hien-tai">@Model.TieuDe</span>
+</nav>
+
+<article class="fb-card fb-card-pad" style="max-width: 860px; margin: 0 auto;">
+    <span class="fb-eyebrow">Tin FruitBen</span>
+    <h1 style="font-size: clamp(1.7rem, 3.4vw, 2.4rem); margin: 12px 0 10px; text-wrap: balance;">@Model.TieuDe</h1>
+    <div class="fb-news-meta mb-3">
+        <span><i class="far fa-calendar-alt"></i> @Model.NgayDang.ToString("dd/MM/yyyy HH:mm")</span>
+        <span><i class="far fa-user"></i> @Model.NguoiDang</span>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.HinhAnh))
+    {
+        <img src="~/assets/img/tintuc/@Model.HinhAnh" alt="@Model.TieuDe" style="width: 100%; max-height: 460px; object-fit: cover; border-radius: 5px;" class="mb-4" />
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.TomTat))
+    {
+        <p style="font-size: 1.08rem; font-weight: 600; color: var(--fb-green-dark);">@Model.TomTat</p>
+    }
+
+    <div class="fb-prose" style="white-space: pre-line;">@Model.NoiDung</div>
+
+    <div class="d-flex flex-wrap mt-4 pt-3" style="gap: 10px; border-top: 1px solid var(--fb-border);">
+        <a class="fb-btn fb-btn-soft" href="@Url.Action("Index", "TinTuc")"><i class="fas fa-arrow-left"></i> Tất cả tin tức</a>
+        <a class="fb-btn fb-btn-grad" href="@Url.Action("Index", "SanPham")">Mua trái cây <i class="fas fa-arrow-right"></i></a>
+    </div>
+</article>

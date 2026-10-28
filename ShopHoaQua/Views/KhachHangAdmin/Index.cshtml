@@ -1,0 +1,63 @@
+@model List<ShopHoaQua.Controllers.KhachHangDong>
+@{
+    ViewBag.TieuDeTrang = "Khách hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var sapXep = ViewBag.SapXep as string;
+}
+
+<div class="ad-head">
+    <div>
+        <span class="fb-eyebrow">Khách hàng</span>
+        <h1>Danh sách khách hàng</h1>
+        <p>@Model.Count tài khoản · tổng chi tiêu không tính đơn đã huỷ.</p>
+    </div>
+</div>
+
+<section class="ad-panel">
+    <form class="ad-filter-bar" method="get" action="@Url.Action("Index")">
+        <input type="search" class="fb-control" name="tuKhoa" value="@ViewBag.TuKhoa" placeholder="Tên, email hoặc số điện thoại..." aria-label="Tìm khách hàng" />
+        <select name="sapXep" class="fb-control" data-auto-apply aria-label="Sắp xếp">
+            <option value="" @(string.IsNullOrEmpty(sapXep) ? "selected" : "")>Mới đăng ký</option>
+            <option value="chitieu" @(sapXep == "chitieu" ? "selected" : "")>Chi tiêu nhiều nhất</option>
+            <option value="sodon" @(sapXep == "sodon" ? "selected" : "")>Nhiều đơn nhất</option>
+        </select>
+        <button type="submit" class="fb-btn fb-btn-grad"><i class="fas fa-search"></i> Tìm</button>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <div class="ad-empty">Không có khách hàng nào phù hợp.</div>
+    }
+    else
+    {
+        <div class="ad-table-wrap">
+            <table class="ad-table">
+                <thead><tr><th>Khách hàng</th><th>Điện thoại</th><th>Ngày đăng ký</th><th class="num">Số đơn</th><th class="num">Tổng chi tiêu</th><th>Đơn gần nhất</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var kh in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="ad-sp" style="min-width: 220px;">
+                                    <span class="fb-avatar" style="width: 42px; height: 42px; font-size: 1rem; margin: 0;">@kh.TaiKhoan.HoTen.Trim().Substring(0, 1).ToUpper()</span>
+                                    <div><b>@kh.TaiKhoan.HoTen</b><small>@kh.TaiKhoan.Email</small></div>
+                                </div>
+                            </td>
+                            <td>@(string.IsNullOrEmpty(kh.TaiKhoan.SoDienThoai) ? "—" : kh.TaiKhoan.SoDienThoai)</td>
+                            <td>@kh.TaiKhoan.NgayDangKy.ToString("dd/MM/yyyy")</td>
+                            <td class="num">@kh.SoDon</td>
+                            <td class="num font-weight-bold">@kh.TongChiTieu.ToString("#,##0")đ</td>
+                            <td>@(kh.DonGanNhat.HasValue ? kh.DonGanNhat.Value.ToString("dd/MM/yyyy") : "—")</td>
+                            <td>
+                                @if (kh.SoDon > 0)
+                                {
+                                    <a class="fb-btn fb-btn-soft fb-btn-sm" href="@Url.Action("Index", "DonHangAdmin", new { taiKhoanId = kh.TaiKhoan.TaiKhoanId })">Xem đơn</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

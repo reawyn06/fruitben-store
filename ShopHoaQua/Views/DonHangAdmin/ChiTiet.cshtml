@@ -1,0 +1,171 @@
+@model ShopHoaQua.Models.DonHang
+@using ShopHoaQua.Models
+@{
+    ViewBag.TieuDeTrang = "Đơn " + Model.MaHienThi;
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var tiepTheo = (string[])ViewBag.TrangThaiTiepTheo;
+    var taiKhoan = ViewBag.TaiKhoan as TaiKhoan;
+}
+
+<div class="ad-head">
+    <div>
+        <a href="@Url.Action("Index")" class="text-muted" style="font-size: .88rem;"><i class="fas fa-arrow-left"></i> Danh sách đơn</a>
+        <h1>Đơn @Model.MaHienThi</h1>
+        <p>Đặt lúc @Model.NgayDat.ToString("HH:mm dd/MM/yyyy")@(Model.NgayCapNhat.HasValue ? " · Cập nhật " + Model.NgayCapNhat.Value.ToString("HH:mm dd/MM/yyyy") : "")</p>
+    </div>
+    @Html.Partial("_TrangThaiDon", Model.TrangThai)
+</div>
+
+<section class="ad-grid">
+    <div style="min-width: 0;">
+        <!-- Xử lý đơn -->
+        <div class="ad-panel mb-4">
+            <div class="ad-panel-head">
+                <div><span class="fb-eyebrow">Xử lý</span><h2>Chuyển trạng thái</h2></div>
+            </div>
+            @if (tiepTheo.Length == 0)
+            {
+                <p class="text-muted mb-0">Đơn đã ở trạng thái cuối (“@Model.TrangThai”), không thể chuyển tiếp.</p>
+            }
+            else
+            {
+                <div class="ad-steps">
+                    @foreach (var tt in tiepTheo)
+                    {
+                        if (tt == TrangThaiDonHang.DaHuy)
+                        {
+                            <button type="button" class="fb-btn fb-btn-danger" data-toggle="modal" data-target="#modalHuy"><i class="fas fa-times"></i> Huỷ đơn</button>
+                        }
+                        else
+                        {
+                            using (Html.BeginForm("DoiTrangThai", "DonHangAdmin", FormMethod.Post, new { @class = "m-0" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.DonHangId" />
+                                <input type="hidden" name="trangThaiMoi" value="@tt" />
+                                <button type="submit" class="fb-btn fb-btn-grad"><i class="fas @(tt == TrangThaiDonHang.DangGiao ? "fa-truck" : "fa-check")"></i> Chuyển sang “@tt”</button>
+                            }
+                        }
+                    }
+                </div>
+                <p class="text-muted mt-3 mb-0" style="font-size: .82rem;">Quy trình: Chờ xử lý → Đang giao → Hoàn thành. Huỷ đơn sẽ tự cộng lại tồn kho và trả lượt cho mã giảm giá. Đơn COD chuyển “Hoàn thành” được tính là đã thanh toán.</p>
+            }
+
+            @if (Model.PhuongThucThanhToan == PhuongThucThanhToan.QR && !Model.DaThanhToan && Model.TrangThai != TrangThaiDonHang.DaHuy)
+            {
+                <div class="fb-note-box mt-3 d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
+                    <span><i class="fas fa-qrcode"></i> Khách chọn chuyển khoản, nội dung cần kiểm tra: <b>@Model.NoiDungChuyenKhoan</b> · <b>@Model.TongTien.ToString("#,##0")đ</b></span>
+                    @using (Html.BeginForm("DaThanhToan", "DonHangAdmin", new { id = Model.DonHangId }, FormMethod.Post, new { @class = "m-0" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="fb-btn fb-btn-soft fb-btn-sm"><i class="fas fa-check"></i> Đã nhận tiền</button>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Sản phẩm -->
+        <div class="ad-panel">
+            <div class="ad-panel-head"><div><span class="fb-eyebrow">Sản phẩm</span><h2>@Model.ChiTietDonHangs.Count mặt hàng</h2></div></div>
+            <div class="ad-table-wrap">
+                <table class="ad-table">
+                    <thead><tr><th>Sản phẩm</th><th class="num">Đơn giá</th><th class="num">Số lượng</th><th class="num">Thành tiền</th></tr></thead>
+                    <tbody>
+                        @foreach (var ct in Model.ChiTietDonHangs)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="ad-sp">
+                                        <img src="~/assets/img/products/@(ct.SanPham != null ? ct.SanPham.HinhAnh : "")" alt="" />
+                                        <div><b>@(ct.SanPham != null ? ct.SanPham.TenSanPham : "Sản phẩm #" + ct.SanPhamId)</b><small>@(ct.SanPham != null ? ct.SanPham.Loai : "")</small></div>
+                                    </div>
+                                </td>
+                                <td class="num">@ct.DonGia.ToString("#,##0")đ</td>
+                                <td class="num">@ct.SoLuong kg</td>
+                                <td class="num font-weight-bold">@ct.ThanhTien.ToString("#,##0")đ</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="ml-auto mt-3" style="max-width: 360px;">
+                <div class="fb-sum-row"><span>Tạm tính</span><span>@Model.TamTinh.ToString("#,##0")đ</span></div>
+                <div class="fb-sum-row"><span>Phí vận chuyển</span><span>@(Model.PhiVanChuyen == 0 ? "Miễn phí" : Model.PhiVanChuyen.ToString("#,##0") + "đ")</span></div>
+                @if (Model.GiamGia > 0)
+                {
+                    <div class="fb-sum-row giam"><span>Giảm giá (@Model.MaGiamGiaApDung)</span><span>-@Model.GiamGia.ToString("#,##0")đ</span></div>
+                }
+                <div class="fb-sum-total"><span class="font-weight-bold">Tổng</span><strong>@Model.TongTien.ToString("#,##0")đ</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="min-width: 0;">
+        <div class="ad-panel mb-4">
+            <div class="ad-panel-head"><div><span class="fb-eyebrow">Giao hàng</span><h2>Người nhận</h2></div></div>
+            <dl class="ad-kv">
+                <dt>Họ tên</dt><dd>@Model.HoTenNguoiNhan</dd>
+                <dt>Điện thoại</dt><dd>@Model.SoDienThoai</dd>
+                <dt>Email</dt><dd>@(string.IsNullOrEmpty(Model.Email) ? "—" : Model.Email)</dd>
+                <dt>Địa chỉ</dt><dd>@Model.DiaChiDayDu</dd>
+                <dt>Ghi chú</dt><dd>@(string.IsNullOrWhiteSpace(Model.GhiChu) ? "—" : Model.GhiChu)</dd>
+            </dl>
+        </div>
+
+        <div class="ad-panel mb-4">
+            <div class="ad-panel-head"><div><span class="fb-eyebrow">Thanh toán</span><h2>@Model.TenPhuongThucThanhToan</h2></div></div>
+            @if (Model.DaThanhToan)
+            {
+                <span class="fb-pill ok"><i class="fas fa-check-circle"></i> Đã thanh toán</span>
+            }
+            else if (Model.TrangThai == TrangThaiDonHang.DaHuy)
+            {
+                <span class="fb-pill bad">Đơn đã huỷ</span>
+            }
+            else
+            {
+                <span class="fb-pill warn"><i class="fas fa-clock"></i> Chưa thanh toán</span>
+            }
+        </div>
+
+        <div class="ad-panel">
+            <div class="ad-panel-head"><div><span class="fb-eyebrow">Khách hàng</span><h2>@(taiKhoan != null ? taiKhoan.HoTen : "Khách vãng lai")</h2></div></div>
+            @if (taiKhoan != null)
+            {
+                <dl class="ad-kv">
+                    <dt>Email</dt><dd>@taiKhoan.Email</dd>
+                    <dt>Đăng ký</dt><dd>@taiKhoan.NgayDangKy.ToString("dd/MM/yyyy")</dd>
+                    <dt>Số đơn</dt><dd>@ViewBag.SoDonCuaKhach đơn</dd>
+                </dl>
+                <a class="fb-btn fb-btn-soft fb-btn-sm mt-3" href="@Url.Action("Index", new { taiKhoanId = taiKhoan.TaiKhoanId })">Xem các đơn của khách</a>
+            }
+            else
+            {
+                <p class="text-muted mb-0">Đơn đặt không đăng nhập tài khoản.</p>
+            }
+        </div>
+    </div>
+</section>
+
+@if (tiepTheo.Contains(TrangThaiDonHang.DaHuy))
+{
+    <div class="modal fade fb-modal" id="modalHuy" tabindex="-1" role="dialog" aria-labelledby="tieuDeHuy" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="fb-modal-icon"><i class="fas fa-times"></i></div>
+                <h3 id="tieuDeHuy">Huỷ đơn @Model.MaHienThi?</h3>
+                <p>Tồn kho của @Model.ChiTietDonHangs.Count sản phẩm sẽ được cộng lại@(string.IsNullOrEmpty(Model.MaGiamGiaApDung) ? "" : ", mã " + Model.MaGiamGiaApDung + " được hoàn 1 lượt").</p>
+                @using (Html.BeginForm("DoiTrangThai", "DonHangAdmin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.DonHangId" />
+                    <input type="hidden" name="trangThaiMoi" value="@TrangThaiDonHang.DaHuy" />
+                    <div class="fb-modal-actions">
+                        <button type="button" class="fb-btn fb-btn-outline" data-dismiss="modal">Giữ đơn</button>
+                        <button type="submit" class="fb-btn fb-btn-danger">Huỷ đơn</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

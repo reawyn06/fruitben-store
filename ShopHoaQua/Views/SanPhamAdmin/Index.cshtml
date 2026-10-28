@@ -1,0 +1,108 @@
+@model IEnumerable<ShopHoaQua.Models.SanPham>
+@{
+    ViewBag.TieuDeTrang = "Sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var tinhTrang = ViewBag.TinhTrang as string;
+    var loai = ViewBag.Loai as string;
+    var tuKhoa = ViewBag.TuKhoa as string;
+    var dsLoai = ViewBag.DanhSachLoai as List<string> ?? new List<string>();
+    var nguong = ShopHoaQua.Controllers.QuanTriController.NGUONG_SAP_HET_HANG;
+}
+
+<div class="ad-head">
+    <div>
+        <span class="fb-eyebrow">Kho hàng</span>
+        <h1>Danh sách sản phẩm</h1>
+        <p>@Model.Count() sản phẩm đang hiển thị.</p>
+    </div>
+    <a class="fb-btn fb-btn-grad" href="@Url.Action("Them")"><i class="fas fa-plus"></i> Thêm sản phẩm</a>
+</div>
+
+<section class="ad-panel">
+    <div class="ad-tabs">
+        <a class="fb-chip @(string.IsNullOrEmpty(tinhTrang) ? "active" : "")" href="@Url.Action("Index", new { tuKhoa, loai })">Tất cả</a>
+        <a class="fb-chip @(tinhTrang == "dangban" ? "active" : "")" href="@Url.Action("Index", new { tuKhoa, loai, tinhTrang = "dangban" })">Đang bán <span class="fb-chip-count">@ViewBag.SoDangBan</span></a>
+        <a class="fb-chip @(tinhTrang == "saphet" ? "active" : "")" href="@Url.Action("Index", new { tuKhoa, loai, tinhTrang = "saphet" })">Sắp hết <span class="fb-chip-count">@ViewBag.SoSapHet</span></a>
+        <a class="fb-chip @(tinhTrang == "giamgia" ? "active" : "")" href="@Url.Action("Index", new { tuKhoa, loai, tinhTrang = "giamgia" })">Đang giảm giá <span class="fb-chip-count">@ViewBag.SoGiamGia</span></a>
+        <a class="fb-chip @(tinhTrang == "ngung" ? "active" : "")" href="@Url.Action("Index", new { tuKhoa, loai, tinhTrang = "ngung" })">Ngừng bán <span class="fb-chip-count">@ViewBag.SoNgung</span></a>
+    </div>
+
+    <form class="ad-filter-bar" method="get" action="@Url.Action("Index")">
+        <input type="hidden" name="tinhTrang" value="@tinhTrang" />
+        <input type="search" class="fb-control" name="tuKhoa" value="@tuKhoa" placeholder="Tìm theo tên sản phẩm..." aria-label="Tìm sản phẩm" />
+        <select name="loai" class="fb-control" data-auto-apply aria-label="Loại">
+            <option value="">Tất cả loại</option>
+            @foreach (var l in dsLoai)
+            {
+                <option value="@l" @(l == loai ? "selected" : "")>@l</option>
+            }
+        </select>
+        <button type="submit" class="fb-btn fb-btn-grad"><i class="fas fa-search"></i> Lọc</button>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <div class="ad-empty">Không có sản phẩm nào phù hợp.</div>
+    }
+    else
+    {
+        <div class="ad-table-wrap">
+            <table class="ad-table">
+                <thead>
+                    <tr><th>Sản phẩm</th><th>Loại</th><th class="num">Giá / kg</th><th class="num">Tồn kho</th><th>Trạng thái</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var sp in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="ad-sp">
+                                    <img src="~/assets/img/products/@sp.HinhAnh" alt="" loading="lazy" />
+                                    <div><b>@sp.TenSanPham</b><small>#@sp.SanPhamId · thêm @sp.NgayTao.ToString("dd/MM/yyyy")</small></div>
+                                </div>
+                            </td>
+                            <td><span class="fb-pill">@sp.Loai</span></td>
+                            <td class="num">
+                                <b class="fb-price">@sp.Gia.ToString("#,##0")đ</b>
+                                @if (sp.DangGiamGia)
+                                {
+                                    <br /><span class="fb-old-price">@sp.GiaCu.Value.ToString("#,##0")đ</span> <span class="fb-sale-pill" style="font-size: .7rem;">-@sp.PhanTramGiam%</span>
+                                }
+                            </td>
+                            <td class="num">
+                                <b style="color: @(sp.SoLuongTon <= nguong ? "var(--fb-red)" : "inherit");">@sp.SoLuongTon kg</b>
+                            </td>
+                            <td>
+                                @if (!sp.ConHang)
+                                {
+                                    <span class="fb-pill">Ngừng bán</span>
+                                }
+                                else if (sp.SoLuongTon == 0)
+                                {
+                                    <span class="fb-pill bad">Hết hàng</span>
+                                }
+                                else if (sp.SoLuongTon <= nguong)
+                                {
+                                    <span class="fb-pill warn">Cần nhập</span>
+                                }
+                                else
+                                {
+                                    <span class="fb-pill ok">Đang bán</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="ad-actions">
+                                    <a class="ad-icon-btn" href="@Url.Action("Sua", new { id = sp.SanPhamId })" title="Sửa" aria-label="Sửa @sp.TenSanPham"><i class="fas fa-pen"></i></a>
+                                    @if (sp.ConHang)
+                                    {
+                                        <a class="ad-icon-btn do" href="@Url.Action("Xoa", new { id = sp.SanPhamId })" title="Ngừng kinh doanh" aria-label="Ngừng kinh doanh @sp.TenSanPham"><i class="fas fa-ban"></i></a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

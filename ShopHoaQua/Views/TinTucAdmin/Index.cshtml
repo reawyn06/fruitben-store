@@ -1,0 +1,34 @@
+﻿@model IEnumerable<ShopHoaQua.Models.TinTuc>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewBag.TieuDeTrang = "Quản lý tin tức";
+}
+<div class="ad-head">
+    <div><h1>Quản lý tin tức</h1><p>Quản lý bài viết hiển thị trên cửa hàng.</p></div>
+    <a class="fb-btn fb-btn-grad" href="@Url.Action("Them")"><i class="fas fa-plus"></i> Thêm tin tức</a>
+</div>
+<form method="get" action="@Url.Action("Index")" class="d-flex mb-3" style="gap:10px;">
+    <input type="search" name="tuKhoa" value="@ViewBag.TuKhoa" class="form-control" placeholder="Tìm theo tiêu đề..." aria-label="Tìm tin tức" />
+    <button class="fb-btn fb-btn-grad" type="submit">Tìm</button>
+    <a class="fb-btn fb-btn-outline" href="@Url.Action("Index")">Tất cả</a>
+</form>
+<div class="fb-card fb-card-pad table-responsive">
+    <table class="table table-hover">
+        <thead><tr><th>Ảnh</th><th>Tiêu đề</th><th>Người đăng</th><th>Ngày đăng</th><th>Thao tác</th></tr></thead>
+        <tbody>
+        @foreach (var tin in Model)
+        {
+            <tr>
+                <td>@if (!string.IsNullOrEmpty(tin.HinhAnh)) { <img src="@Url.Content("~/assets/img/tintuc/" + tin.HinhAnh)" alt="" style="width:80px;height:60px;object-fit:cover;" /> }</td>
+                <td>@tin.TieuDe</td><td>@tin.NguoiDang</td><td>@tin.NgayDang.ToString("dd/MM/yyyy HH:mm")</td>
+                <td style="min-width:160px;">
+                    <a href="@Url.Action("ChiTiet", "TinTuc", new { id = tin.TinTucId })">Xem</a> ·
+                    <a href="@Url.Action("Sua", new { id = tin.TinTucId })">Sửa</a> ·
+                    <a class="text-danger" href="@Url.Action("Xoa", new { id = tin.TinTucId })">Xóa</a>
+                </td>
+            </tr>
+        }
+        @if (!Model.Any()) { <tr><td colspan="5" class="text-center text-muted">Chưa có tin tức phù hợp.</td></tr> }
+        </tbody>
+    </table>
+</div>

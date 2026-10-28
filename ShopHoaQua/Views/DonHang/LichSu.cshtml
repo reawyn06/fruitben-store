@@ -1,0 +1,68 @@
+@model List<ShopHoaQua.Models.DonHang>
+@using ShopHoaQua.Models
+@{
+    ViewBag.TieuDeTrang = "Đơn hàng của tôi";
+    var dem = ViewBag.DemTheoTrangThai as Dictionary<string, int> ?? new Dictionary<string, int>();
+    var dangChon = ViewBag.TrangThai as string;
+    var tong = dem.Values.Sum();
+}
+
+<section class="fb-card fb-page-head">
+    <div>
+        <span class="fb-eyebrow"><i class="fas fa-receipt"></i> Tài khoản của bạn</span>
+        <h1>Đơn hàng của tôi</h1>
+        <p>Theo dõi trạng thái giao hàng, xem lại hoặc huỷ đơn chưa xử lý.</p>
+    </div>
+    <a class="fb-btn fb-btn-grad" href="@Url.Action("Index", "SanPham")"><i class="fas fa-shopping-basket"></i> Mua thêm</a>
+</section>
+
+<div class="fb-chip-list my-4">
+    <a class="fb-chip @(string.IsNullOrEmpty(dangChon) ? "active" : "")" href="@Url.Action("LichSu")">Tất cả <span class="fb-chip-count">@tong</span></a>
+    @foreach (var tt in TrangThaiDonHang.TatCa)
+    {
+        <a class="fb-chip @(tt == dangChon ? "active" : "")" href="@Url.Action("LichSu", new { trangThai = tt })">@tt <span class="fb-chip-count">@(dem.ContainsKey(tt) ? dem[tt] : 0)</span></a>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="fb-card fb-empty">
+        <i class="fas fa-receipt"></i>
+        <h3>@(string.IsNullOrEmpty(dangChon) ? "Bạn chưa có đơn hàng nào" : "Không có đơn “" + dangChon + "”")</h3>
+        <p>Các đơn bạn đặt khi đã đăng nhập sẽ hiện ở đây.</p>
+        <a class="fb-btn fb-btn-grad mt-2" href="@Url.Action("Index", "SanPham")">Bắt đầu mua sắm</a>
+    </div>
+}
+else
+{
+    foreach (var dh in Model)
+    {
+        var sp = dh.ChiTietDonHangs.ToList();
+        <article class="fb-card fb-order-card">
+            <div class="fb-order-card-head">
+                <div>
+                    <b style="font-size: 1.05rem;">@dh.MaHienThi</b>
+                    <span class="text-muted ml-2" style="font-size: .85rem;"><i class="far fa-clock"></i> @dh.NgayDat.ToString("HH:mm dd/MM/yyyy")</span>
+                </div>
+                @Html.Partial("_TrangThaiDon", dh.TrangThai)
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap: 14px;">
+                <div class="fb-order-thumbs">
+                    @foreach (var ct in sp.Take(4))
+                    {
+                        <img src="~/assets/img/products/@(ct.SanPham != null ? ct.SanPham.HinhAnh : "")" alt="@(ct.SanPham != null ? ct.SanPham.TenSanPham : "")" title="@(ct.SanPham != null ? ct.SanPham.TenSanPham : "") × @ct.SoLuong kg" />
+                    }
+                    @if (sp.Count > 4)
+                    {
+                        <span class="them">+@(sp.Count - 4)</span>
+                    }
+                </div>
+                <div class="text-right">
+                    <div class="text-muted" style="font-size: .82rem;">@sp.Count sản phẩm · @dh.TenPhuongThucThanhToan</div>
+                    <div class="fb-price" style="font-size: 1.25rem;">@dh.TongTien.ToString("#,##0")đ</div>
+                </div>
+                <a class="fb-btn fb-btn-soft" href="@Url.Action("ChiTiet", new { id = dh.DonHangId })">Xem chi tiết <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </article>
+    }
+}

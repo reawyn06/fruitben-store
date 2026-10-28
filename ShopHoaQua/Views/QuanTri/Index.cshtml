@@ -1,0 +1,202 @@
+@model ShopHoaQua.Controllers.TongQuanViewModel
+@using ShopHoaQua.Models
+@{
+    ViewBag.TieuDeTrang = "Tổng quan";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var maxNgay = Model.DoanhThu7Ngay.Max(x => x.Tien);
+    if (maxNgay <= 0) { maxNgay = 1; }
+    var tong7Ngay = Model.DoanhThu7Ngay.Sum(x => x.Tien);
+    var thu = new[] { "CN", "T2", "T3", "T4", "T5", "T6", "T7" };
+    Func<decimal, string> rutGon = v => v >= 1000000 ? (v / 1000000m).ToString("0.#") + "tr" : (v >= 1000 ? (v / 1000m).ToString("0") + "k" : v.ToString("0"));
+}
+
+<!-- 1. BĂNG RÔN (giống "SPORTIX SELLER CENTER") -->
+<section class="ad-hero">
+    <span class="fb-eyebrow">FruitBen Seller Center</span>
+    <h1>Chào @(Session["HoTen"] ?? "bạn"), hôm nay có @Model.SoDonChoXuLy đơn đang chờ xử lý</h1>
+    <p>Theo dõi doanh thu, đơn hàng, tồn kho và mã giảm giá trên cùng một bảng điều khiển.</p>
+    <div class="d-flex flex-wrap" style="gap: 10px;">
+        <a class="fb-btn fb-btn-grad" href="@Url.Action("Index", "DonHangAdmin", new { trangThai = TrangThaiDonHang.ChoXuLy })"><i class="fas fa-receipt"></i> Xử lý đơn mới</a>
+        <a class="fb-btn fb-btn-white" href="@Url.Action("Them", "SanPhamAdmin")"><i class="fas fa-plus"></i> Thêm sản phẩm</a>
+    </div>
+</section>
+
+<!-- 2. THẺ THỐNG KÊ -->
+<section class="ad-stats">
+    <div class="ad-stat">
+        <span class="ico"><i class="fas fa-coins"></i></span>
+        <div><p>Doanh thu</p><h3>@Model.DoanhThu.ToString("#,##0")đ</h3><span>Tháng này: @Model.DoanhThuThangNay.ToString("#,##0")đ</span></div>
+    </div>
+    <a class="ad-stat" href="@Url.Action("Index", "DonHangAdmin")">
+        <span class="ico lam"><i class="fas fa-receipt"></i></span>
+        <div><p>Đơn hàng</p><h3>@Model.SoDon</h3><span>@Model.SoDonChoXuLy chờ xử lý · @Model.SoDonDangGiao đang giao</span></div>
+    </a>
+    <a class="ad-stat" href="@Url.Action("Index", "SanPhamAdmin", new { tinhTrang = "dangban" })">
+        <span class="ico cam"><i class="fas fa-apple-alt"></i></span>
+        <div><p>Sản phẩm đang bán</p><h3>@Model.SoSanPhamDangBan</h3><span class="@(Model.SoSapHetHang > 0 ? "canh-bao" : "")">@Model.SoSapHetHang sắp hết hàng</span></div>
+    </a>
+    <a class="ad-stat" href="@Url.Action("Index", "KhachHangAdmin")">
+        <span class="ico do"><i class="fas fa-users"></i></span>
+        <div><p>Khách hàng</p><h3>@Model.SoKhachHang</h3><span>+@Model.SoKhachMoiThangNay trong tháng</span></div>
+    </a>
+</section>
+
+<!-- 3. DOANH THU 7 NGÀY + BÁN CHẠY -->
+<section class="ad-grid">
+    <div class="ad-panel">
+        <div class="ad-panel-head">
+            <div>
+                <span class="fb-eyebrow">Doanh thu</span>
+                <h2>7 ngày gần nhất: @tong7Ngay.ToString("#,##0")đ</h2>
+            </div>
+            <a class="fb-btn fb-btn-soft fb-btn-sm" href="@Url.Action("Index", "ThongKeAdo")"><i class="fas fa-chart-line"></i> Báo cáo chi tiết</a>
+        </div>
+        <div class="ad-chart" role="img" aria-label="Biểu đồ doanh thu 7 ngày, không tính đơn huỷ">
+            @foreach (var ngay in Model.DoanhThu7Ngay)
+            {
+                var cao = (int)Math.Round(ngay.Tien * 82 / maxNgay); // chừa chỗ cho nhãn số tiền phía trên cột
+                <div class="ad-bar @(ngay.Ngay == DateTime.Today ? "hom-nay" : "")" title="@ngay.Ngay.ToString("dd/MM"): @ngay.Tien.ToString("#,##0")đ · @ngay.SoDon đơn">
+                    <strong>@(ngay.Tien > 0 ? rutGon(ngay.Tien) : "")</strong>
+                    <div class="cot @(ngay.Tien > 0 ? "" : "rong")" style="height: @(Math.Max(cao, 2))%;"></div>
+                </div>
+            }
+        </div>
+        <div class="ad-chart-labels">
+            @foreach (var ngay in Model.DoanhThu7Ngay)
+            {
+                <span>@thu[(int)ngay.Ngay.DayOfWeek]<br /><small>@ngay.Ngay.ToString("dd/MM")</small></span>
+            }
+        </div>
+    </div>
+
+    <div class="ad-panel">
+        <div class="ad-panel-head">
+            <div><span class="fb-eyebrow">Bán chạy</span><h2>Top trái cây</h2></div>
+        </div>
+        @if (!Model.BanChay.Any())
+        {
+            <div class="ad-empty">Chưa có đơn hàng nào.</div>
+        }
+        else
+        {
+            <div class="ad-list">
+                @for (int i = 0; i < Model.BanChay.Count; i++)
+                {
+                    var bc = Model.BanChay[i];
+                    <a class="ad-item" href="@Url.Action("Sua", "SanPhamAdmin", new { id = bc.SanPham.SanPhamId })">
+                        <span class="rank">@(i + 1)</span>
+                        <img src="~/assets/img/products/@bc.SanPham.HinhAnh" alt="" />
+                        <span class="info"><b>@bc.SanPham.TenSanPham</b><small>Đã bán @bc.SoLuong kg · @bc.DoanhThu.ToString("#,##0")đ</small></span>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<!-- 4. ĐƠN MỚI + SẮP HẾT HÀNG -->
+<section class="ad-grid">
+    <div class="ad-panel">
+        <div class="ad-panel-head">
+            <div><span class="fb-eyebrow">Đơn hàng</span><h2>Đơn gần đây</h2></div>
+            <a class="fb-btn fb-btn-soft fb-btn-sm" href="@Url.Action("Index", "DonHangAdmin")">Xem tất cả</a>
+        </div>
+        @if (!Model.DonMoi.Any())
+        {
+            <div class="ad-empty">Chưa có đơn hàng nào.</div>
+        }
+        else
+        {
+            <div class="ad-table-wrap">
+                <table class="ad-table">
+                    <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Thời gian</th><th class="num">Tổng tiền</th><th>Trạng thái</th></tr></thead>
+                    <tbody>
+                        @foreach (var dh in Model.DonMoi)
+                        {
+                            <tr>
+                                <td><a class="font-weight-bold" href="@Url.Action("ChiTiet", "DonHangAdmin", new { id = dh.DonHangId })">@dh.MaHienThi</a></td>
+                                <td>@dh.HoTenNguoiNhan<br /><small class="text-muted">@dh.SoDienThoai</small></td>
+                                <td><small>@dh.NgayDat.ToString("HH:mm dd/MM")</small></td>
+                                <td class="num font-weight-bold">@dh.TongTien.ToString("#,##0")đ</td>
+                                <td>@Html.Partial("_TrangThaiDon", dh.TrangThai)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="ad-panel">
+        <div class="ad-panel-head">
+            <div><span class="fb-eyebrow">Tồn kho</span><h2>Sắp hết hàng (≤ @ShopHoaQua.Controllers.QuanTriController.NGUONG_SAP_HET_HANG kg)</h2></div>
+        </div>
+        @if (!Model.SapHetHang.Any())
+        {
+            <div class="ad-empty"><i class="fas fa-check-circle" style="color: var(--fb-green);"></i> Tất cả sản phẩm đều đủ hàng.</div>
+        }
+        else
+        {
+            <div class="ad-list">
+                @foreach (var sp in Model.SapHetHang)
+                {
+                    <a class="ad-item" href="@Url.Action("Sua", "SanPhamAdmin", new { id = sp.SanPhamId })">
+                        <img src="~/assets/img/products/@sp.HinhAnh" alt="" />
+                        <span class="info"><b>@sp.TenSanPham</b><small>Còn @sp.SoLuongTon kg</small></span>
+                        <span class="fb-pill @(sp.SoLuongTon == 0 ? "bad" : "warn")">@(sp.SoLuongTon == 0 ? "Hết hàng" : "Cần nhập")</span>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<!-- 5. KHÁCH MỚI + VIỆC CẦN LÀM -->
+<section class="ad-grid deu">
+    <div class="ad-panel">
+        <div class="ad-panel-head">
+            <div><span class="fb-eyebrow">Khách hàng</span><h2>Đăng ký gần đây</h2></div>
+            <a class="fb-btn fb-btn-soft fb-btn-sm" href="@Url.Action("Index", "KhachHangAdmin")">Xem tất cả</a>
+        </div>
+        @if (!Model.KhachMoi.Any())
+        {
+            <div class="ad-empty">Chưa có khách hàng đăng ký.</div>
+        }
+        else
+        {
+            <div class="ad-list">
+                @foreach (var tk in Model.KhachMoi)
+                {
+                    <div class="ad-item">
+                        <span class="icon"><i class="fas fa-user"></i></span>
+                        <span class="info"><b>@tk.HoTen</b><small>@tk.Email · @tk.NgayDangKy.ToString("dd/MM/yyyy")</small></span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="ad-panel">
+        <div class="ad-panel-head">
+            <div><span class="fb-eyebrow">Cần xử lý</span><h2>Việc hôm nay</h2></div>
+        </div>
+        <div class="ad-list">
+            <a class="ad-item" href="@Url.Action("Index", "DonHangAdmin", new { trangThai = TrangThaiDonHang.ChoXuLy })">
+                <span class="icon cam"><i class="fas fa-clock"></i></span>
+                <span class="info"><b>@Model.SoDonChoXuLy đơn chờ xác nhận</b><small>Gọi xác nhận và chuyển sang “Đang giao”</small></span>
+            </a>
+            <a class="ad-item" href="@Url.Action("Index", "DonHangAdmin", new { trangThai = TrangThaiDonHang.DangGiao })">
+                <span class="icon"><i class="fas fa-truck"></i></span>
+                <span class="info"><b>@Model.SoDonDangGiao đơn đang giao</b><small>Cập nhật “Hoàn thành” khi khách đã nhận</small></span>
+            </a>
+            <a class="ad-item" href="@Url.Action("Index", "SanPhamAdmin", new { tinhTrang = "saphet" })">
+                <span class="icon cam"><i class="fas fa-warehouse"></i></span>
+                <span class="info"><b>@Model.SoSapHetHang sản phẩm sắp hết</b><small>Nhập thêm hàng hoặc tạm ngừng bán</small></span>
+            </a>
+            <div class="ad-item">
+                <span class="icon"><i class="fas fa-envelope"></i></span>
+                <span class="info"><b>@Model.SoLienHeChuaXuLy liên hệ chưa trả lời</b><small>Tin nhắn từ trang Liên hệ</small></span>
+            </div>
+        </div>
+    </div>
+</section>

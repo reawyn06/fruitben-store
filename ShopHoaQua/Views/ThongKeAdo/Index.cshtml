@@ -1,0 +1,100 @@
+@model System.Data.DataTable
+@{
+    ViewBag.TieuDeTrang = "Báo cáo ADO.NET";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var danhSachSanPham = ViewBag.DanhSachSanPham as System.Data.DataTable;
+    decimal maxDoanhThu = 1;
+    if (Model != null)
+    {
+        foreach (System.Data.DataRow d in Model.Rows) { maxDoanhThu = Math.Max(maxDoanhThu, Convert.ToDecimal(d["TongDoanhThu"])); }
+    }
+}
+
+<div class="ad-head">
+    <div>
+        <span class="fb-eyebrow"><i class="fas fa-database"></i> ADO.NET thuần (Chương 3.1, 3.2)</span>
+        <h1>Báo cáo thống kê</h1>
+        <p>Dữ liệu đọc bằng SqlConnection, SqlCommand, SqlDataReader, SqlDataAdapter và DataSet, không qua Entity Framework. Không tính đơn đã huỷ.</p>
+    </div>
+</div>
+
+<section class="ad-stats" style="grid-template-columns: repeat(2, 1fr);">
+    <div class="ad-stat">
+        <span class="ico lam"><i class="fas fa-receipt"></i></span>
+        <div><p>Tổng số đơn hàng</p><h3>@ViewBag.TongSoDonHang</h3><span>SqlCommand.ExecuteScalar()</span></div>
+    </div>
+    <div class="ad-stat">
+        <span class="ico"><i class="fas fa-coins"></i></span>
+        <div><p>Tổng doanh thu</p><h3>@(ViewBag.TongDoanhThu != null ? string.Format("{0:#,##0}", ViewBag.TongDoanhThu) : "0")đ</h3><span>SqlDataReader đọc từng dòng</span></div>
+    </div>
+</section>
+
+<section class="ad-panel mb-4">
+    <div class="ad-panel-head">
+        <div><span class="fb-eyebrow">DataSet · JOIN + GROUP BY</span><h2>Doanh thu theo sản phẩm</h2></div>
+    </div>
+    <div class="ad-table-wrap">
+        <table class="ad-table">
+            <thead><tr><th>Sản phẩm</th><th class="num">Đã bán</th><th class="num">Doanh thu</th><th style="width: 34%;">Tỉ lệ</th></tr></thead>
+            <tbody>
+                @if (Model == null || Model.Rows.Count == 0)
+                {
+                    <tr><td colspan="4" class="ad-empty">Chưa có dữ liệu bán hàng.</td></tr>
+                }
+                else
+                {
+                    foreach (System.Data.DataRow dong in Model.Rows)
+                    {
+                        var tien = Convert.ToDecimal(dong["TongDoanhThu"]);
+                        var phanTram = (int)Math.Round(tien * 100 / maxDoanhThu);
+                        <tr>
+                            <td class="font-weight-bold">@dong["TenSanPham"]</td>
+                            <td class="num">@dong["TongSoLuongBan"] kg</td>
+                            <td class="num font-weight-bold">@string.Format("{0:#,##0}", tien)đ</td>
+                            <td><div class="ad-progress"><span style="width: @(phanTram)%;"></span></div></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="ad-panel">
+    <div class="ad-panel-head">
+        <div><span class="fb-eyebrow">SqlDataAdapter.Fill → DataTable</span><h2>Bảng SanPhams (đọc trực tiếp)</h2></div>
+    </div>
+    <div class="ad-table-wrap">
+        <table class="ad-table">
+            <thead>
+                <tr>
+                    @if (danhSachSanPham != null)
+                    {
+                        foreach (System.Data.DataColumn cot in danhSachSanPham.Columns)
+                        {
+                            <th>@cot.ColumnName</th>
+                        }
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (danhSachSanPham == null || danhSachSanPham.Rows.Count == 0)
+                {
+                    <tr><td colspan="10" class="ad-empty">Không có dữ liệu sản phẩm.</td></tr>
+                }
+                else
+                {
+                    foreach (System.Data.DataRow dong in danhSachSanPham.Rows)
+                    {
+                        <tr>
+                            @foreach (System.Data.DataColumn cot in danhSachSanPham.Columns)
+                            {
+                                <td>@dong[cot]</td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

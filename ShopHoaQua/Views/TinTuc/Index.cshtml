@@ -1,0 +1,31 @@
+@model IEnumerable<ShopHoaQua.Models.TinTuc>
+@{
+    ViewBag.TieuDeTrang = "Tin tức";
+    var ds = Model.ToList();
+    var noiBat = ds.FirstOrDefault();
+}
+
+<section class="fb-card fb-page-head">
+    <div>
+        <span class="fb-eyebrow"><i class="fas fa-lemon"></i> Góc FruitBen</span>
+        <h1>Tin tức &amp; mẹo chọn trái cây</h1>
+        <p>Khuyến mãi mới, mùa vụ đang vào và cách bảo quản trái cây tươi lâu hơn.</p>
+    </div>
+    <img class="fb-page-head-img" src="~/assets/img/tintuc/news-bg-1.jpg" alt="Giỏ trái cây nhiều loại" />
+</section>
+
+@if (!ds.Any())
+{
+    <div class="fb-card fb-empty mt-4"><i class="far fa-newspaper"></i><h3>Chưa có bài viết</h3><p>FruitBen sẽ sớm cập nhật tin mới.</p></div>
+}
+else
+{
+    <section class="fb-section">
+        <div class="fb-news">
+            @foreach (var tin in ds)
+            {
+                @Html.Partial("_TheTinTuc", tin)
+            }
+        </div>
+    </section>
+}

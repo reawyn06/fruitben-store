@@ -1,0 +1,126 @@
+@model ShopHoaQua.Models.GioHang
+@using ShopHoaQua.Services
+@{
+    ViewBag.TieuDeTrang = "Giỏ hàng";
+    var coHang = Model != null && Model.Items.Any();
+    var tamTinh = coHang ? Model.TongTien : 0;
+    var conThieu = Math.Max(0, CauHinhVanChuyen.MIEN_PHI_TU - tamTinh);
+    var phanTram = (int)Math.Min(100, tamTinh * 100 / CauHinhVanChuyen.MIEN_PHI_TU);
+    var tietKiem = coHang ? Model.Items.Where(i => i.GiaCu.HasValue).Sum(i => (i.GiaCu.Value - i.Gia) * i.SoLuong) : 0;
+}
+
+<!-- 1. ĐẦU TRANG -->
+<section class="fb-card fb-page-head">
+    <div>
+        <span class="fb-eyebrow"><i class="fas fa-shopping-basket"></i> Giỏ hàng FruitBen</span>
+        <h1>Giỏ hàng của bạn</h1>
+        <p>Kiểm tra trái cây, số kg và tạm tính trước khi thanh toán.</p>
+    </div>
+    <div class="d-flex flex-column" style="gap: 10px;">
+        @if (Session["TaiKhoanId"] != null)
+        {
+            <a class="fb-btn fb-btn-grad" href="@Url.Action("LichSu", "DonHang")"><i class="fas fa-receipt"></i> Xem đơn đã đặt</a>
+        }
+        <a class="fb-btn fb-btn-soft" href="@Url.Action("Index", "SanPham")"><i class="fas fa-arrow-left"></i> Tiếp tục mua sắm</a>
+    </div>
+</section>
+
+<!-- 2. CÁC BƯỚC -->
+<div class="fb-steps">
+    <div class="fb-step hien-tai"><span class="so">1</span><div><strong>Giỏ hàng</strong><small>Kiểm tra sản phẩm</small></div></div>
+    <div class="fb-step"><span class="so">2</span><div><strong>Thông tin</strong><small>Giao hàng &amp; thanh toán</small></div></div>
+    <div class="fb-step"><span class="so">3</span><div><strong>Hoàn tất</strong><small>Xác nhận đơn</small></div></div>
+</div>
+
+@if (!coHang)
+{
+    <div class="fb-card fb-empty">
+        <i class="fas fa-shopping-basket"></i>
+        <h3>Giỏ hàng đang trống</h3>
+        <p>Chọn vài loại trái cây tươi cho hôm nay nhé.</p>
+        <a class="fb-btn fb-btn-grad mt-2" href="@Url.Action("Index", "SanPham")">Đi tới cửa hàng</a>
+    </div>
+}
+else
+{
+    <div class="fb-checkout">
+        <!-- 3. DANH SÁCH TRONG GIỎ -->
+        <section class="fb-card fb-card-pad">
+            <div class="fb-box-head">
+                <h3>@Model.Items.Count sản phẩm · @Model.TongSoLuong kg</h3>
+                <span class="fb-pill ok"><i class="fas fa-shipping-fast"></i> Miễn phí ship từ @CauHinhVanChuyen.MIEN_PHI_TU.ToString("#,##0")đ</span>
+            </div>
+
+            @foreach (var item in Model.Items)
+            {
+                <div class="fb-cart-item">
+                    <a class="fb-cart-thumb" href="@Url.Action("ChiTiet", "SanPham", new { id = item.SanPhamId })">
+                        <img src="~/assets/img/products/@item.HinhAnh" alt="@item.TenSanPham" />
+                    </a>
+                    <div class="fb-cart-info">
+                        <h4><a href="@Url.Action("ChiTiet", "SanPham", new { id = item.SanPhamId })" style="color: inherit;">@item.TenSanPham</a></h4>
+                        <div class="meta">@(item.Loai ?? "Trái cây") · @item.Gia.ToString("#,##0")đ/kg
+                            @if (item.GiaCu.HasValue)
+                            {
+                                <span class="fb-old-price">@item.GiaCu.Value.ToString("#,##0")đ</span>
+                            }
+                        </div>
+                        <div class="fb-price mt-1">@item.ThanhTien.ToString("#,##0")đ</div>
+                    </div>
+                    <div class="fb-cart-side">
+                        @using (Html.BeginForm("CapNhat", "GioHang", FormMethod.Post, new { @class = "m-0" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("sanPhamId", item.SanPhamId, new { id = "sp" + item.SanPhamId })
+                            <div class="fb-qty" data-qty data-auto-submit>
+                                <button type="button" data-step="-1" aria-label="Giảm 1 kg">−</button>
+                                <input type="number" name="soLuong" value="@item.SoLuong" min="0" max="999" aria-label="Số kg @item.TenSanPham" />
+                                <button type="button" data-step="1" aria-label="Tăng 1 kg">+</button>
+                            </div>
+                            <noscript><button type="submit" class="fb-btn fb-btn-soft fb-btn-sm mt-1">Cập nhật</button></noscript>
+                        }
+                        @using (Html.BeginForm("Xoa", "GioHang", FormMethod.Post, new { @class = "m-0" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("sanPhamId", item.SanPhamId, new { id = "xoa" + item.SanPhamId })
+                            <button type="submit" class="fb-btn fb-btn-danger fb-btn-sm" onclick="return confirm('Xoá @item.TenSanPham khỏi giỏ hàng?');">
+                                <i class="fas fa-trash-alt"></i> Xoá
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </section>
+
+        <!-- 4. TÓM TẮT -->
+        <aside class="fb-card fb-card-pad fb-sticky">
+            <div class="fb-box-head">
+                <h3>Tổng đơn hàng</h3>
+                <span class="fb-box-icon"><i class="fas fa-receipt"></i></span>
+            </div>
+            <div class="fb-sum-row"><span>Tạm tính (@Model.TongSoLuong kg)</span><span>@tamTinh.ToString("#,##0")đ</span></div>
+            @if (tietKiem > 0)
+            {
+                <div class="fb-sum-row giam"><span>Đã tiết kiệm nhờ giá sale</span><span>-@tietKiem.ToString("#,##0")đ</span></div>
+            }
+            <div class="fb-sum-total"><span class="font-weight-bold">Tổng tạm tính</span><strong>@tamTinh.ToString("#,##0")đ</strong></div>
+
+            <div class="fb-freeship mt-3">
+                @if (conThieu > 0)
+                {
+                    <span><i class="fas fa-truck"></i> Mua thêm <b>@conThieu.ToString("#,##0")đ</b> để được miễn phí giao hàng</span>
+                }
+                else
+                {
+                    <span><i class="fas fa-check-circle"></i> Đơn của bạn được <b>miễn phí giao hàng</b></span>
+                }
+                <div class="bar"><span style="width: @(phanTram)%;"></span></div>
+            </div>
+
+            <div class="fb-note-box mt-3"><i class="fas fa-info-circle"></i> Phí vận chuyển và mã giảm giá được tính ở bước thanh toán.</div>
+
+            <a class="fb-btn fb-btn-grad fb-btn-lg fb-btn-block mt-3" href="@Url.Action("ThanhToan", "DonHang")">Thanh toán ngay <i class="fas fa-arrow-right"></i></a>
+            <a class="fb-btn fb-btn-soft fb-btn-block mt-2" href="@Url.Action("Index", "SanPham")"><i class="fas fa-plus"></i> Mua thêm sản phẩm</a>
+        </aside>
+    </div>
+}

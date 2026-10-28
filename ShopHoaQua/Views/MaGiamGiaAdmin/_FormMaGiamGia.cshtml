@@ -1,0 +1,99 @@
+@model ShopHoaQua.Models.MaGiamGia
+@using ShopHoaQua.Models
+@* Partial View: form dùng chung cho Tạo và Sửa mã giảm giá. *@
+<div class="ad-form-grid">
+    <div class="ad-panel">
+        <div class="fb-field">
+            @Html.LabelFor(m => m.Ma)
+            @Html.TextBoxFor(m => m.Ma, new { @class = "fb-control", placeholder = "VD: FRUITBEN10", style = "text-transform: uppercase; font-weight: 800; letter-spacing: .05em;", autocomplete = "off" })
+            <small class="text-muted">Chữ in hoa không dấu và số, không khoảng trắng. Mã được viết hoa tự động.</small>
+            @Html.ValidationMessageFor(m => m.Ma)
+        </div>
+        <div class="fb-field">
+            @Html.LabelFor(m => m.MoTa)
+            @Html.TextBoxFor(m => m.MoTa, new { @class = "fb-control", placeholder = "VD: Giảm 10% cho đơn từ 200.000đ" })
+            @Html.ValidationMessageFor(m => m.MoTa)
+        </div>
+
+        <div class="fb-field">
+            <label>Loại giảm</label>
+            <div class="form-row">
+                <div class="col-sm-6">
+                    <label class="fb-pay-option mb-2 @(Model.Loai == MaGiamGia.LOAI_PHAN_TRAM ? "checked" : "")" for="loaiPhanTram">
+                        @Html.RadioButtonFor(m => m.Loai, MaGiamGia.LOAI_PHAN_TRAM, new { id = "loaiPhanTram" })
+                        <span class="ico"><i class="fas fa-percent"></i></span>
+                        <span><strong>Theo phần trăm</strong><small>Có thể đặt mức giảm tối đa</small></span>
+                    </label>
+                </div>
+                <div class="col-sm-6">
+                    <label class="fb-pay-option mb-2 @(Model.Loai == MaGiamGia.LOAI_SO_TIEN ? "checked" : "")" for="loaiSoTien">
+                        @Html.RadioButtonFor(m => m.Loai, MaGiamGia.LOAI_SO_TIEN, new { id = "loaiSoTien" })
+                        <span class="ico"><i class="fas fa-money-bill-wave"></i></span>
+                        <span><strong>Số tiền cố định</strong><small>Giảm thẳng vào tạm tính</small></span>
+                    </label>
+                </div>
+            </div>
+            @Html.ValidationMessageFor(m => m.Loai)
+        </div>
+
+        <div class="form-row">
+            <div class="col-md-4 fb-field">
+                <label for="GiaTri" id="nhanGiaTri">Giá trị giảm</label>
+                @Html.TextBoxFor(m => m.GiaTri, "{0:0}", new { @class = "fb-control", type = "number", min = "1", step = "1", data_val_number = "Giá trị phải là số." })
+                @Html.ValidationMessageFor(m => m.GiaTri)
+            </div>
+            <div class="col-md-4 fb-field" id="oGiamToiDa">
+                @Html.LabelFor(m => m.GiamToiDa)
+                @Html.TextBoxFor(m => m.GiamToiDa, "{0:0}", new { @class = "fb-control", type = "number", min = "0", step = "1000", placeholder = "Không giới hạn", data_val_number = "Phải là số." })
+                @Html.ValidationMessageFor(m => m.GiamToiDa)
+            </div>
+            <div class="col-md-4 fb-field">
+                @Html.LabelFor(m => m.DonToiThieu)
+                @Html.TextBoxFor(m => m.DonToiThieu, "{0:0}", new { @class = "fb-control", type = "number", min = "0", step = "1000", data_val_number = "Phải là số." })
+                @Html.ValidationMessageFor(m => m.DonToiThieu)
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-panel">
+        <div class="fb-field">
+            <label for="SoLuong">Số lượt sử dụng <small class="text-muted">(để trống = không giới hạn)</small></label>
+            @Html.TextBoxFor(m => m.SoLuong, new { @class = "fb-control", type = "number", min = "1", step = "1", placeholder = "Không giới hạn", data_val_number = "Phải là số nguyên." })
+            @if (Model.DaDung > 0)
+            {
+                <small class="text-muted">Đã dùng @Model.DaDung lượt.</small>
+            }
+            @Html.ValidationMessageFor(m => m.SoLuong)
+        </div>
+        <div class="form-row">
+            <div class="col-6 fb-field">
+                @Html.LabelFor(m => m.NgayBatDau)
+                <input type="date" class="fb-control" id="NgayBatDau" name="NgayBatDau" value="@(Model.NgayBatDau.HasValue ? Model.NgayBatDau.Value.ToString("yyyy-MM-dd") : "")" />
+                @Html.ValidationMessageFor(m => m.NgayBatDau)
+            </div>
+            <div class="col-6 fb-field">
+                @Html.LabelFor(m => m.NgayKetThuc)
+                <input type="date" class="fb-control" id="NgayKetThuc" name="NgayKetThuc" value="@(Model.NgayKetThuc.HasValue ? Model.NgayKetThuc.Value.ToString("yyyy-MM-dd") : "")" />
+                @Html.ValidationMessageFor(m => m.NgayKetThuc)
+            </div>
+        </div>
+        <label class="ad-switch mt-1" for="KichHoat">
+            @Html.CheckBoxFor(m => m.KichHoat) Đang kích hoạt (khách dùng được ngay)
+        </label>
+    </div>
+</div>
+
+<script>
+    // Đổi nhãn và ẩn "Giảm tối đa" khi chọn loại số tiền cố định
+    (function () {
+        var r1 = document.getElementById("loaiPhanTram"), r2 = document.getElementById("loaiSoTien");
+        var nhan = document.getElementById("nhanGiaTri"), o = document.getElementById("oGiamToiDa");
+        function cap() {
+            var pt = r1.checked;
+            nhan.textContent = pt ? "Phần trăm giảm (%)" : "Số tiền giảm (đ)";
+            o.style.display = pt ? "" : "none";
+            [r1, r2].forEach(function (r) { r.closest(".fb-pay-option").classList.toggle("checked", r.checked); });
+        }
+        r1.addEventListener("change", cap); r2.addEventListener("change", cap); cap();
+    })();
+</script>

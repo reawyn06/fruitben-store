@@ -1,0 +1,142 @@
+﻿@{
+    var controller = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
+    var hoTen = Session["HoTen"] as string ?? "Quản trị viên";
+    var chuCai = string.IsNullOrEmpty(hoTen) ? "A" : hoTen.Trim().Substring(0, 1).ToUpper();
+    var soDonCho = Html.Action("DemDonChoXuLy", "QuanTri").ToString();
+    Func<string, string> navActive = c => string.Equals(c, controller, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>@(ViewBag.TieuDeTrang ?? "Quản trị") - Quản trị FruitBen</title>
+    <link rel="shortcut icon" type="image/png" href="~/assets/img/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/assets/css/all.min.css" />
+    <link rel="stylesheet" href="~/assets/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/assets/css/site.css" />
+    <link rel="stylesheet" href="~/assets/css/admin.css" />
+    @RenderSection("styles", required: false)
+</head>
+<body class="ad-body">
+    <div class="ad-layout">
+        <!-- ===== THANH BÊN (giống sidebar admin SPORTIX) ===== -->
+        <aside class="ad-sidebar" id="adSidebar">
+            <a class="ad-brand" href="@Url.Action("Index", "QuanTri")">
+                <span class="ad-brand-icon"><i class="fas fa-apple-alt"></i></span>
+                <span>FruitBen<small>Seller Center</small></span>
+            </a>
+
+            <nav class="ad-nav">
+                <div class="ad-nav-label">Tổng quan</div>
+                <a class="@navActive("QuanTri")" href="@Url.Action("Index", "QuanTri")"><i class="fas fa-tachometer-alt"></i> Tổng quan</a>
+                <a class="@navActive("ThongKeAdo")" href="@Url.Action("Index", "ThongKeAdo")"><i class="fas fa-chart-line"></i> Báo cáo ADO.NET</a>
+
+                <div class="ad-nav-label">Bán hàng</div>
+                <a class="@navActive("DonHangAdmin")" href="@Url.Action("Index", "DonHangAdmin")">
+                    <i class="fas fa-receipt"></i> Đơn hàng
+                    @if (!string.IsNullOrEmpty(soDonCho))
+                    {
+                        <span class="ad-count" title="Đơn chờ xử lý">@soDonCho</span>
+                    }
+                </a>
+                <a class="@navActive("SanPhamAdmin")" href="@Url.Action("Index", "SanPhamAdmin")"><i class="fas fa-box-open"></i> Sản phẩm</a>
+                <a class="@navActive("MaGiamGiaAdmin")" href="@Url.Action("Index", "MaGiamGiaAdmin")"><i class="fas fa-ticket-alt"></i> Mã giảm giá</a>
+                <a class="@navActive("KhachHangAdmin")" href="@Url.Action("Index", "KhachHangAdmin")"><i class="fas fa-users"></i> Khách hàng</a>
+                <div class="ad-nav-label">Nội dung</div>
+                <a class="@navActive("TinTucAdmin")" href="@Url.Action("Index", "TinTucAdmin")"><i class="far fa-newspaper"></i> Tin tức</a>
+            </nav>
+
+            <div class="ad-sidebar-foot">
+                <a href="@Url.Action("Index", "Home")" target="_blank"><i class="fas fa-store"></i> Xem cửa hàng</a>
+                <a href="@Url.Action("DangXuat", "TaiKhoan")" data-toggle="modal" data-target="#modalDangXuat"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+            </div>
+        </aside>
+
+        <div class="ad-main">
+            <!-- ===== THANH TRÊN ===== -->
+            <header class="ad-topbar">
+                <button type="button" class="fb-icon-btn ad-menu-btn" id="adMenuBtn" aria-label="Mở menu"><i class="fas fa-bars"></i></button>
+                <form action="@Url.Action("Index", "SanPhamAdmin")" method="get" role="search">
+                    <i class="fas fa-search"></i>
+                    <input type="search" name="tuKhoa" placeholder="Tìm sản phẩm..." aria-label="Tìm sản phẩm" />
+                </form>
+                <div class="ml-auto d-flex align-items-center" style="gap: 10px;">
+                    <a class="fb-icon-btn ad-bell" href="@Url.Action("Index", "DonHangAdmin", new { trangThai = ShopHoaQua.Models.TrangThaiDonHang.ChoXuLy })" title="Đơn chờ xử lý" aria-label="Đơn chờ xử lý">
+                        <i class="far fa-bell"></i>
+                        @if (!string.IsNullOrEmpty(soDonCho))
+                        {
+                            <span class="fb-badge-count">@soDonCho</span>
+                        }
+                    </a>
+                    <div class="dropdown">
+                        <button class="ad-user dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="av">@chuCai</span>
+                            <span class="text-left d-none d-sm-inline">@hoTen<small>Quản trị viên</small></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="@Url.Action("Index", "Home")" target="_blank"><i class="fas fa-store mr-2"></i> Xem cửa hàng</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="@Url.Action("DangXuat", "TaiKhoan")" data-toggle="modal" data-target="#modalDangXuat"><i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ===== THÔNG BÁO ===== -->
+            <div class="fb-toasts" aria-live="polite">
+                @if (TempData["ThongBao"] != null)
+                {
+                    <div class="fb-toast" role="status"><span class="fb-toast-icon"><i class="fas fa-check"></i></span><div class="fb-toast-body">@TempData["ThongBao"]</div><button class="fb-toast-close" type="button" aria-label="Đóng">&times;</button></div>
+                }
+                @if (TempData["ThongBaoThanhCong"] != null)
+                {
+                    <div class="fb-toast" role="status"><span class="fb-toast-icon"><i class="fas fa-check"></i></span><div class="fb-toast-body">@TempData["ThongBaoThanhCong"]</div><button class="fb-toast-close" type="button" aria-label="Đóng">&times;</button></div>
+                }
+                @if (TempData["ThongBaoLoi"] != null)
+                {
+                    <div class="fb-toast loi" role="alert"><span class="fb-toast-icon"><i class="fas fa-exclamation"></i></span><div class="fb-toast-body">@TempData["ThongBaoLoi"]</div><button class="fb-toast-close" type="button" aria-label="Đóng">&times;</button></div>
+                }
+            </div>
+
+            @RenderBody()
+        </div>
+    </div>
+
+    <!-- Modal xác nhận đăng xuất -->
+    <div class="modal fade fb-modal" id="modalDangXuat" tabindex="-1" role="dialog" aria-labelledby="tieuDeDangXuat" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="fb-modal-icon"><i class="fas fa-sign-out-alt"></i></div>
+                <h3 id="tieuDeDangXuat">Đăng xuất tài khoản?</h3>
+                <p>Bạn sẽ thoát khỏi khu quản trị FruitBen.</p>
+                <div class="fb-modal-actions">
+                    <button type="button" class="fb-btn fb-btn-outline" data-dismiss="modal">Ở lại</button>
+                    <a class="fb-btn fb-btn-danger" href="@Url.Action("DangXuat", "TaiKhoan")">Đăng xuất</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/assets/js/jquery-1.11.3.min.js"></script>
+    <script src="~/assets/js/jquery.validate.min.js"></script>
+    <script src="~/assets/js/jquery.validate.messages_vi.min.js"></script>
+    <script src="~/assets/js/jquery.validate.unobtrusive.min.js"></script>
+    <!-- Bootstrap 4 bản "bundle" (đã gồm Popper.js) để dropdown, modal hoạt động -->
+    <script src="~/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/js/site.js"></script>
+    <script>
+        // Mở/đóng thanh bên trên màn hình nhỏ
+        (function () {
+            var btn = document.getElementById("adMenuBtn"), bar = document.getElementById("adSidebar");
+            if (!btn || !bar) return;
+            btn.addEventListener("click", function (e) { e.stopPropagation(); bar.classList.toggle("mo"); });
+            document.addEventListener("click", function (e) { if (!bar.contains(e.target)) bar.classList.remove("mo"); });
+        })();
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

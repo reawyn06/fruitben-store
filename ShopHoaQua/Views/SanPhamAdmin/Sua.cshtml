@@ -1,0 +1,26 @@
+@model ShopHoaQua.Models.SanPham
+@{
+    ViewBag.TieuDeTrang = "Sửa sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="ad-head">
+    <div>
+        <a href="@Url.Action("Index")" class="text-muted" style="font-size: .88rem;"><i class="fas fa-arrow-left"></i> Danh sách sản phẩm</a>
+        <h1>Sửa sản phẩm #@Model.SanPhamId</h1>
+        <p>Đổi giá chỉ áp dụng cho đơn mới; khách đang có sản phẩm trong giỏ sẽ được báo giá mới khi thanh toán.</p>
+    </div>
+    <a class="fb-btn fb-btn-soft" href="@Url.Action("ChiTiet", "SanPham", new { id = Model.SanPhamId })" target="_blank"><i class="fas fa-external-link-alt"></i> Xem trên cửa hàng</a>
+</div>
+
+@using (Html.BeginForm("Sua", "SanPhamAdmin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SanPhamId)
+    @Html.ValidationSummary(true, "", new { @class = "fb-error mb-3" })
+    @Html.Partial("_FormSanPham", Model)
+    <div class="ad-form-actions">
+        <a class="fb-btn fb-btn-outline" href="@Url.Action("Index")">Huỷ bỏ</a>
+        <button type="submit" class="fb-btn fb-btn-grad"><i class="fas fa-save"></i> Lưu thay đổi</button>
+    </div>
+}

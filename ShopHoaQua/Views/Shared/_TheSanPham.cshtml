@@ -1,0 +1,52 @@
+@model ShopHoaQua.Models.SanPham
+@*
+    Partial View: 1 thẻ sản phẩm (dùng ở Trang chủ, Cửa hàng, Chi tiết - sản phẩm liên quan).
+    Theo thẻ sản phẩm mẫu Fruitkha: ảnh, tên, loại, giá mỗi kg (+ giá cũ), nút cam "Thêm vào giỏ hàng".
+*@
+@{
+    var hetHang = Model.SoLuongTon <= 0;
+    var linkChiTiet = Url.Action("ChiTiet", "SanPham", new { id = Model.SanPhamId });
+}
+<article class="fb-product">
+    <a class="fb-product-img" href="@linkChiTiet" aria-label="@Model.TenSanPham">
+        <img src="~/assets/img/products/@Model.HinhAnh" alt="@Model.TenSanPham" loading="lazy" />
+        @if (hetHang)
+        {
+            <span class="fb-tag het">Hết hàng</span>
+        }
+        else if (Model.DangGiamGia)
+        {
+            <span class="fb-tag sale">Sale</span>
+        }
+        else if (Model.LaHangMoi)
+        {
+            <span class="fb-tag">Mới</span>
+        }
+        @if (Model.DangGiamGia)
+        {
+            <span class="fb-percent">-@Model.PhanTramGiam%</span>
+        }
+    </a>
+    <div class="fb-product-body">
+        <h3 class="fb-product-name"><a href="@linkChiTiet">@Model.TenSanPham</a></h3>
+        <span class="fb-product-cat">@Model.Loai · Giá mỗi kg</span>
+        <div class="fb-product-price">
+            <span class="fb-price">@Model.Gia.ToString("#,##0")đ</span>
+            @if (Model.DangGiamGia)
+            {
+                <span class="fb-old-price">@Model.GiaCu.Value.ToString("#,##0")đ</span>
+            }
+        </div>
+        <div class="fb-product-actions">
+            @using (Html.BeginForm("ThemVaoGio", "GioHang", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("sanPhamId", Model.SanPhamId)
+                @Html.Hidden("soLuong", 1)
+                <button type="submit" class="fb-btn fb-btn-grad" @(hetHang ? "disabled" : "") title="Thêm 1 kg vào giỏ" aria-label="Thêm @Model.TenSanPham vào giỏ">
+                    <i class="fas fa-shopping-cart"></i> @(hetHang ? "Hết hàng" : "Thêm vào giỏ hàng")
+                </button>
+            }
+        </div>
+    </div>
+</article>

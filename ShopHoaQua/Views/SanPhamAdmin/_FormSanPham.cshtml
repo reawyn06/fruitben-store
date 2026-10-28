@@ -1,0 +1,120 @@
+@model ShopHoaQua.Models.SanPham
+@*
+    Partial View dùng chung cho form Thêm và Sửa sản phẩm (Chương 2: Partial View).
+    Dropdown loại lấy từ ViewBag.DanhSachLoai (SanPhamAdminController.NapDanhSachLoai).
+    Form cha phải có enctype="multipart/form-data" để tải ảnh.
+*@
+@{
+    var coAnh = !string.IsNullOrEmpty(Model.HinhAnh);
+    var anhPhu = (Model.HinhAnhPhu ?? new List<ShopHoaQua.Models.HinhAnhSanPham>()).OrderBy(a => a.ThuTu).ToList();
+}
+
+<div class="ad-form-grid">
+    <!-- Cột trái: thông tin -->
+    <div class="ad-panel">
+        <div class="form-row">
+            <div class="col-md-7 fb-field">
+                <label for="TenSanPham">Tên sản phẩm <span class="req">*</span></label>
+                @Html.TextBoxFor(m => m.TenSanPham, new { @class = "fb-control", placeholder = "VD: Táo Envy New Zealand" })
+                @Html.ValidationMessageFor(m => m.TenSanPham)
+            </div>
+            <div class="col-md-5 fb-field">
+                <label for="Loai">Loại <span class="req">*</span></label>
+                @Html.DropDownListFor(m => m.Loai, (SelectList)ViewBag.DanhSachLoai, "-- Chọn loại --", new { @class = "fb-control" })
+                @Html.ValidationMessageFor(m => m.Loai)
+            </div>
+        </div>
+
+        <!-- Giá: định dạng {0:0} để không hiện "220000,00" (văn hoá vi-VN dùng dấu phẩy) -->
+        <div class="form-row">
+            <div class="col-md-4 fb-field">
+                <label for="Gia">Giá bán / kg (đ) <span class="req">*</span></label>
+                @Html.TextBoxFor(m => m.Gia, "{0:0}", new { @class = "fb-control", type = "number", step = "1000", placeholder = "85000", data_val_number = "Giá phải là số." })
+                @Html.ValidationMessageFor(m => m.Gia)
+            </div>
+            <div class="col-md-4 fb-field">
+                <label for="GiaCu">Giá cũ / kg (đ)</label>
+                @Html.TextBoxFor(m => m.GiaCu, "{0:0}", new { @class = "fb-control", type = "number", step = "1000", placeholder = "Để trống nếu không giảm", data_val_number = "Giá cũ phải là số." })
+                @Html.ValidationMessageFor(m => m.GiaCu)
+            </div>
+            <div class="col-md-4 fb-field">
+                <label for="SoLuongTon">Tồn kho (kg) <span class="req">*</span></label>
+                @Html.TextBoxFor(m => m.SoLuongTon, new { @class = "fb-control", type = "number", step = "1", data_val_number = "Tồn kho phải là số nguyên." })
+                @Html.ValidationMessageFor(m => m.SoLuongTon)
+            </div>
+        </div>
+        <div class="fb-note-box mb-3" id="xemGiam" hidden><i class="fas fa-fire" style="color: var(--fb-red);"></i> Sản phẩm sẽ hiện nhãn <b>Sale</b> và giảm <b id="phanTramGiam"></b>.</div>
+
+        <div class="fb-field">
+            <label for="MoTa">Mô tả</label>
+            @Html.TextAreaFor(m => m.MoTa, new { @class = "fb-control", rows = 5, placeholder = "Nguồn gốc, hương vị, cách dùng..." })
+        </div>
+
+        <label class="ad-switch" for="ConHangCheck">
+            @Html.CheckBoxFor(m => m.ConHang, new { id = "ConHangCheck" }) Đang mở bán trên website
+        </label>
+    </div>
+
+    <!-- Cột phải: ảnh -->
+    <div class="ad-panel">
+        <label class="font-weight-bold">Ảnh chính</label>
+        <div class="ad-preview" id="khungAnh">
+            @if (coAnh)
+            {
+                <img id="anhXemTruoc" src="~/assets/img/products/@Model.HinhAnh" alt="Ảnh sản phẩm" />
+            }
+            else
+            {
+                <img id="anhXemTruoc" src="" alt="Ảnh sản phẩm" hidden />
+                <i class="far fa-image" id="iconTrong"></i>
+            }
+        </div>
+        <div class="fb-field mt-3">
+            <input type="file" name="fileHinhAnh" id="fileHinhAnh" accept=".jpg,.jpeg,.png,.webp,.gif" class="form-control-file" />
+            @Html.ValidationMessage("fileHinhAnh", new { @class = "field-validation-error" })
+            <small class="text-muted d-block mt-1">.jpg/.png/.webp/.gif, tối đa 2 MB · lưu vào <code>assets/img/products/</code></small>
+            <label for="HinhAnh" class="mt-2" style="font-size: .82rem;">Hoặc tên file đã có sẵn</label>
+            @Html.TextBoxFor(m => m.HinhAnh, new { @class = "fb-control", style = "height: 40px;", placeholder = "vd: dau-tay.jpg" })
+        </div>
+
+        <label class="font-weight-bold">Ảnh phụ <small class="text-muted">(thư viện ảnh ở trang chi tiết)</small></label>
+        @if (anhPhu.Any())
+        {
+            <div class="ad-thumbs mb-2">
+                @foreach (var a in anhPhu)
+                {
+                    <div class="ad-thumb">
+                        <img src="~/assets/img/products/@a.TenFile" alt="" />
+                        <label><input type="checkbox" name="xoaAnhPhu" value="@a.HinhAnhSanPhamId" /> Xoá</label>
+                    </div>
+                }
+            </div>
+        }
+        <input type="file" name="fileAnhPhu" multiple accept=".jpg,.jpeg,.png,.webp,.gif" class="form-control-file" />
+        @Html.ValidationMessage("fileAnhPhu", new { @class = "field-validation-error" })
+        <small class="text-muted d-block mt-1">Chọn nhiều ảnh cùng lúc (tối đa 6 ảnh/lần).</small>
+    </div>
+</div>
+
+<script>
+        (function () {
+            var input = document.getElementById("fileHinhAnh"), anh = document.getElementById("anhXemTruoc"), icon = document.getElementById("iconTrong");
+            if (input && anh && window.FileReader) {
+                input.addEventListener("change", function () {
+                    if (!input.files || !input.files[0]) return;
+                    var r = new FileReader();
+                    r.onload = function (e) { anh.src = e.target.result; anh.hidden = false; if (icon) icon.style.display = "none"; };
+                    r.readAsDataURL(input.files[0]);
+                });
+            }
+            var gia = document.getElementById("Gia"), giaCu = document.getElementById("GiaCu");
+            var hop = document.getElementById("xemGiam"), pt = document.getElementById("phanTramGiam");
+            function tinh() {
+                var g = parseFloat(gia.value), c = parseFloat(giaCu.value);
+                var ok = g > 0 && c > g;
+                hop.hidden = !ok;
+                if (ok) pt.textContent = Math.round((c - g) * 100 / c) + "%";
+            }
+            if (gia && giaCu) { gia.addEventListener("input", tinh); giaCu.addEventListener("input", tinh); tinh(); }
+        })();
+</script>

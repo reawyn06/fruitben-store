@@ -1,0 +1,25 @@
+@model ShopHoaQua.Models.MaGiamGia
+@{
+    ViewBag.TieuDeTrang = "Sửa mã " + Model.Ma;
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="ad-head">
+    <div>
+        <a href="@Url.Action("Index")" class="text-muted" style="font-size: .88rem;"><i class="fas fa-arrow-left"></i> Mã giảm giá</a>
+        <h1>Sửa mã @Model.Ma</h1>
+        <p>Thay đổi chỉ áp dụng cho đơn đặt sau khi lưu; đơn cũ giữ nguyên số tiền đã giảm.</p>
+    </div>
+</div>
+
+@using (Html.BeginForm("Sua", "MaGiamGiaAdmin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MaGiamGiaId)
+    @Html.ValidationSummary(true, "", new { @class = "fb-error mb-3" })
+    @Html.Partial("_FormMaGiamGia", Model)
+    <div class="ad-form-actions">
+        <a class="fb-btn fb-btn-outline" href="@Url.Action("Index")">Huỷ bỏ</a>
+        <button type="submit" class="fb-btn fb-btn-grad"><i class="fas fa-save"></i> Lưu thay đổi</button>
+    </div>
+}

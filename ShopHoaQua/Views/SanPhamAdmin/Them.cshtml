@@ -1,0 +1,24 @@
+@model ShopHoaQua.Models.SanPham
+@{
+    ViewBag.TieuDeTrang = "Thêm sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="ad-head">
+    <div>
+        <a href="@Url.Action("Index")" class="text-muted" style="font-size: .88rem;"><i class="fas fa-arrow-left"></i> Danh sách sản phẩm</a>
+        <h1>Thêm sản phẩm mới</h1>
+        <p>Nhập thông tin, giá và ảnh. Sản phẩm mới được gắn nhãn “Mới” trong @ShopHoaQua.Models.SanPham.SO_NGAY_HANG_MOI ngày.</p>
+    </div>
+</div>
+
+@using (Html.BeginForm("Them", "SanPhamAdmin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "fb-error mb-3" })
+    @Html.Partial("_FormSanPham", Model)
+    <div class="ad-form-actions">
+        <a class="fb-btn fb-btn-outline" href="@Url.Action("Index")">Huỷ bỏ</a>
+        <button type="submit" class="fb-btn fb-btn-grad"><i class="fas fa-plus-circle"></i> Thêm sản phẩm</button>
+    </div>
+}

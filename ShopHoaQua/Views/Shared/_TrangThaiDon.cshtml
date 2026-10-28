@@ -1,0 +1,12 @@
+@model string
+@* Partial View: nhãn trạng thái đơn hàng, dùng chung cho khách và admin. *@
+@{
+    string lop = "cho", icon = "fa-clock";
+    switch (Model)
+    {
+        case ShopHoaQua.Models.TrangThaiDonHang.DangGiao: lop = "giao"; icon = "fa-truck"; break;
+        case ShopHoaQua.Models.TrangThaiDonHang.HoanThanh: lop = "xong"; icon = "fa-check-circle"; break;
+        case ShopHoaQua.Models.TrangThaiDonHang.DaHuy: lop = "huy"; icon = "fa-times-circle"; break;
+    }
+}
+<span class="fb-status @lop"><i class="fas @icon"></i> @(Model ?? ShopHoaQua.Models.TrangThaiDonHang.ChoXuLy)</span>

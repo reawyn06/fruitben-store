@@ -1,0 +1,61 @@
+@{
+    ViewBag.TieuDeTrang = "Giới thiệu";
+    var soSanPham = (int)(ViewBag.SoSanPham ?? 0);
+}
+
+<section class="fb-card fb-page-head reveal">
+    <div>
+        <span class="fb-eyebrow"><i class="fas fa-seedling"></i> Về chúng tôi</span>
+        <h1>Nông sản sạch cho mọi nhà</h1>
+        <p>FruitBen là cửa hàng chuyên trái cây tươi theo mùa, tuyển chọn trực tiếp từ nhà vườn chuẩn VietGAP và các nhà nhập khẩu uy tín.</p>
+    </div>
+    <img class="fb-page-head-img" src="~/assets/img/abt.jpg" alt="Giỏ trái cây trên bàn gỗ" />
+</section>
+
+<section class="fb-section reveal">
+    <div class="fb-card fb-about-mini">
+        <div>
+            <span class="fb-eyebrow">Câu chuyện</span>
+            <h2>Trái ngon phải đúng độ chín</h2>
+            <p>Mỗi sáng đội thu mua của FruitBen kiểm từng lô hàng: độ chín, độ ngọt, vết dập. Trái không đạt được loại ngay tại kho. Phần còn lại được bảo quản lạnh và giao trong ngày để đến tay bạn vẫn giữ được hương vị như vừa hái.</p>
+            <p class="mb-0">Chúng tôi bán theo kg, cân đủ, niêm yết giá rõ ràng và đổi ngay nếu trái không đạt.</p>
+        </div>
+        <div class="fb-stats">
+            <div class="fb-stat"><strong>@soSanPham</strong><span>Loại trái cây</span></div>
+            <div class="fb-stat"><strong>34</strong><span>Tỉnh thành giao tới</span></div>
+            <div class="fb-stat"><strong>24h</strong><span>Đổi trả</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="fb-section reveal">
+    <div class="fb-section-head">
+        <div>
+            <span class="fb-eyebrow">Cam kết</span>
+            <h2>Vì sao chọn FruitBen</h2>
+        </div>
+    </div>
+    <div class="fb-info-grid">
+        <div class="fb-info"><i class="fas fa-leaf"></i><h3>Nguồn gốc rõ ràng</h3><p>Trái nội địa từ nhà vườn VietGAP; trái nhập khẩu có giấy kiểm dịch.</p></div>
+        <div class="fb-info"><i class="fas fa-shipping-fast"></i><h3>Giao nhanh, giữ lạnh</h3><p>Nội thành giao trong ngày, đóng thùng xốp kèm đá gel cho đơn tỉnh.</p></div>
+        <div class="fb-info"><i class="fas fa-hand-holding-heart"></i><h3>Đổi trả dễ dàng</h3><p>Trái dập, hỏng báo trong 24 giờ là đổi mới hoặc hoàn tiền.</p></div>
+    </div>
+</section>
+
+<section class="fb-section reveal">
+    <div class="fb-card fb-card-pad">
+        <div class="fb-box-head">
+            <div>
+                <span class="fb-eyebrow">Về đồ án</span>
+                <h3 class="mt-2">Đồ án học phần Lập trình Web – Nhóm 10</h3>
+            </div>
+            <span class="fb-box-icon"><i class="fas fa-award"></i></span>
+        </div>
+        <p class="text-muted">Dự án phát triển từ bài Thiết kế Web (giao diện tĩnh HTML/CSS FruitBen) thành ứng dụng web động theo mô hình <b>ASP.NET MVC 5</b>, dùng <b>Entity Framework 6</b>, <b>ADO.NET</b>, <b>Web API</b> và SQL Server. Giao diện được thiết kế lại theo bố cục của đồ án SPORTIX.</p>
+        <div class="fb-team mt-3">
+            <div class="fb-info fb-member"><div class="fb-avatar">CT</div><h3>Giáp Chí Thanh</h3><p>Sinh viên IT – Developer</p></div>
+            <div class="fb-info fb-member"><div class="fb-avatar">BA</div><h3>Nguyễn Bình An</h3><p>Sinh viên IT – Developer</p></div>
+            <div class="fb-info fb-member"><div class="fb-avatar">QH</div><h3>Hà Quốc Huy</h3><p>Sinh viên IT – Developer</p></div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,17 @@
+﻿@model ShopHoaQua.Models.TinTuc
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewBag.TieuDeTrang = "Sửa tin tức";
+}
+<div class="ad-head"><div><h1>Sửa tin tức</h1><p>Bài viết được hiển thị tại mục Tin tức của cửa hàng sau khi lưu.</p></div></div>
+@using (Html.BeginForm("Sua", "TinTucAdmin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.TinTucId)
+    @Html.ValidationSummary(true, "", new { @class = "fb-error" })
+    @Html.Partial("_FormTinTuc", Model)
+    <div class="ad-form-actions">
+        <a class="fb-btn fb-btn-outline" href="@Url.Action("Index")">Hủy bỏ</a>
+        <button type="submit" class="fb-btn fb-btn-grad">Lưu thay đổi</button>
+    </div>
+}

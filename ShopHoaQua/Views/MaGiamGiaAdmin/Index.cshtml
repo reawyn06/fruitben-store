@@ -1,0 +1,88 @@
+@model List<ShopHoaQua.Models.MaGiamGia>
+@{
+    ViewBag.TieuDeTrang = "Mã giảm giá";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="ad-head">
+    <div>
+        <span class="fb-eyebrow">Khuyến mãi</span>
+        <h1>Quản lý mã giảm giá</h1>
+        <p>@Model.Count(m => m.KichHoat) mã đang bật · khách nhập mã ở bước Thanh toán.</p>
+    </div>
+    <a class="fb-btn fb-btn-grad" href="@Url.Action("Them")"><i class="fas fa-plus"></i> Tạo mã mới</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="ad-panel ad-empty"><i class="fas fa-ticket-alt fa-2x mb-2" style="color: var(--fb-green);"></i><br />Chưa có mã giảm giá nào.</div>
+}
+else
+{
+    <section class="ad-vouchers">
+        @foreach (var ma in Model)
+        {
+            var dungDuoc = ma.KichHoat && !ma.HetHan && !ma.HetLuot && !ma.ChuaToiNgay;
+            var phanTram = ma.SoLuong.HasValue && ma.SoLuong > 0 ? Math.Min(100, ma.DaDung * 100 / ma.SoLuong.Value) : 0;
+            <article class="ad-voucher @(ma.KichHoat ? "" : "tat")">
+                <div class="d-flex justify-content-between align-items-start" style="gap: 8px;">
+                    <span class="ma">@ma.Ma</span>
+                    @if (!ma.KichHoat)
+                    {
+                        <span class="fb-pill">Đã tắt</span>
+                    }
+                    else if (ma.HetHan)
+                    {
+                        <span class="fb-pill bad">Hết hạn</span>
+                    }
+                    else if (ma.HetLuot)
+                    {
+                        <span class="fb-pill bad">Hết lượt</span>
+                    }
+                    else if (ma.ChuaToiNgay)
+                    {
+                        <span class="fb-pill info">Sắp áp dụng</span>
+                    }
+                    else
+                    {
+                        <span class="fb-pill ok">Đang dùng được</span>
+                    }
+                </div>
+                <div class="gia-tri">@ma.MoTaGiaTri</div>
+                @if (!string.IsNullOrEmpty(ma.MoTa))
+                {
+                    <div class="text-muted" style="font-size: .85rem;">@ma.MoTa</div>
+                }
+                <div class="meta">
+                    <span><i class="fas fa-shopping-basket"></i> Đơn từ @ma.DonToiThieu.ToString("#,##0")đ</span>
+                    <span><i class="far fa-calendar-alt"></i> @(ma.NgayBatDau.HasValue ? ma.NgayBatDau.Value.ToString("dd/MM/yyyy") : "Ngay") → @(ma.NgayKetThuc.HasValue ? ma.NgayKetThuc.Value.ToString("dd/MM/yyyy") : "không giới hạn")</span>
+                </div>
+                <div class="meta"><span>Đã dùng <b>@ma.DaDung</b>@(ma.SoLuong.HasValue ? " / " + ma.SoLuong.Value : " lần (không giới hạn)")</span></div>
+                @if (ma.SoLuong.HasValue)
+                {
+                    <div class="ad-progress"><span style="width: @(phanTram)%;"></span></div>
+                }
+                <div class="foot">
+                    @using (Html.BeginForm("BatTat", "MaGiamGiaAdmin", new { id = ma.MaGiamGiaId }, FormMethod.Post, new { @class = "m-0" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="fb-btn @(ma.KichHoat ? "fb-btn-outline" : "fb-btn-soft") fb-btn-sm">
+                            <i class="fas @(ma.KichHoat ? "fa-pause" : "fa-play")"></i> @(ma.KichHoat ? "Tắt" : "Bật")
+                        </button>
+                    }
+                    <div class="ad-actions">
+                        <a class="ad-icon-btn" href="@Url.Action("Sua", new { id = ma.MaGiamGiaId })" title="Sửa" aria-label="Sửa mã @ma.Ma"><i class="fas fa-pen"></i></a>
+                        @using (Html.BeginForm("Xoa", "MaGiamGiaAdmin", new { id = ma.MaGiamGiaId }, FormMethod.Post, new { @class = "m-0" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="ad-icon-btn do" title="@(ma.DaDung > 0 ? "Đã có đơn dùng: chỉ tắt" : "Xoá")" aria-label="Xoá mã @ma.Ma"
+                                    onclick="return confirm('@(ma.DaDung > 0 ? "Mã đã được dùng nên sẽ chỉ bị tắt. Tiếp tục?" : "Xoá hẳn mã " + ma.Ma + "?")');">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    </section>
+}

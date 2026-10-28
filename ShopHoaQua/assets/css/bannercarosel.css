@@ -1,0 +1,93 @@
+﻿.modern-hero-carousel .carousel-item {
+    height: 550px;
+    min-height: 450px;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    position: relative;
+    filter: brightness(1.15);
+}
+
+    .modern-hero-carousel .carousel-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        z-index: 1;
+    }
+
+.modern-hero-carousel .hero-text {
+    position: relative;
+    z-index: 5;
+    text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.6);
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.modern-hero-carousel .hero-text-tablecell {
+    width: 100%;
+}
+
+.modern-hero-carousel .hero-title {
+    white-space: nowrap !important;
+    font-size: 3.5rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 0 !important;
+}
+
+.modern-hero-carousel .hero-btns {
+    position: relative !important;
+    z-index: 99 !important;
+    pointer-events: auto !important;
+}
+
+    .modern-hero-carousel .hero-btns a {
+        position: relative !important;
+        z-index: 100 !important;
+        cursor: pointer !important;
+        display: inline-block;
+    }
+
+.modern-hero-carousel .carousel-control-prev,
+.modern-hero-carousel .carousel-control-next {
+    width: 8% !important;
+    z-index: 10 !important;
+}
+
+.modern-hero-carousel.carousel-fade .carousel-item {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    will-change: opacity;
+}
+
+    .modern-hero-carousel.carousel-fade .carousel-item.active,
+    .modern-hero-carousel.carousel-fade .carousel-item-next.carousel-item-left,
+    .modern-hero-carousel.carousel-fade .carousel-item-prev.carousel-item-right {
+        opacity: 1;
+    }
+
+.modern-hero-carousel.carousel-fade .active.carousel-item-left,
+.modern-hero-carousel.carousel-fade .active.carousel-item-right {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+@media (max-width: 1200px) {
+    .modern-hero-carousel .hero-title {
+        font-size: 2.8rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .modern-hero-carousel .hero-title {
+        white-space: normal !important;
+        font-size: 2rem !important;
+    }
+}

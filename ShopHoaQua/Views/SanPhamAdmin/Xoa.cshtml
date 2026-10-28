@@ -1,0 +1,36 @@
+@model ShopHoaQua.Models.SanPham
+@{
+    ViewBag.TieuDeTrang = "Ngừng kinh doanh";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="ad-head">
+    <div>
+        <a href="@Url.Action("Index")" class="text-muted" style="font-size: .88rem;"><i class="fas fa-arrow-left"></i> Danh sách sản phẩm</a>
+        <h1>Ngừng kinh doanh sản phẩm?</h1>
+        <p>Sản phẩm bị ẩn khỏi cửa hàng nhưng vẫn giữ trong CSDL để không ảnh hưởng các đơn hàng cũ.</p>
+    </div>
+</div>
+
+<section class="ad-panel" style="max-width: 720px;">
+    <div class="ad-sp mb-3">
+        <img src="~/assets/img/products/@Model.HinhAnh" alt="" style="width: 88px; height: 88px; object-fit: cover; border-radius: 5px;" />
+        <div>
+            <b style="font-size: 1.2rem;">@Model.TenSanPham</b>
+            <small>#@Model.SanPhamId · @Model.Loai · @Model.Gia.ToString("#,##0")đ/kg · tồn @Model.SoLuongTon kg</small>
+        </div>
+    </div>
+    @if (!Model.ConHang)
+    {
+        <div class="fb-note-box mb-3"><i class="fas fa-info-circle"></i> Sản phẩm này đã ngừng kinh doanh. Muốn bán lại: vào Sửa và tick “Đang mở bán”.</div>
+    }
+    @using (Html.BeginForm("Xoa", "SanPhamAdmin", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.SanPhamId)
+        <div class="ad-form-actions">
+            <a class="fb-btn fb-btn-outline" href="@Url.Action("Index")">Giữ lại</a>
+            <button type="submit" class="fb-btn fb-btn-danger" @(Model.ConHang ? "" : "disabled")><i class="fas fa-ban"></i> Ngừng kinh doanh</button>
+        </div>
+    }
+</section>

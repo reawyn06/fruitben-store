@@ -1,0 +1,208 @@
+@model ShopHoaQua.Models.DatHangViewModel
+@using ShopHoaQua.Models
+@using ShopHoaQua.Services
+@{
+    ViewBag.TieuDeTrang = "Thanh toán";
+    var gioHang = (GioHang)ViewBag.GioHang;
+    var tinhTien = (KetQuaTinhTien)ViewBag.TinhTien;
+    var maGoiY = ViewBag.MaGoiY as List<MaGiamGia> ?? new List<MaGiamGia>();
+    var laQR = Model.PhuongThucThanhToan == PhuongThucThanhToan.QR;
+    var chuaTinhShip = tinhTien.ChuaChonTinh && tinhTien.TamTinh < CauHinhVanChuyen.MIEN_PHI_TU;
+}
+
+<!-- 1. ĐẦU TRANG -->
+<section class="fb-card fb-page-head">
+    <div>
+        <span class="fb-eyebrow"><i class="fas fa-credit-card"></i> Thanh toán FruitBen</span>
+        <h1>Thanh toán đơn hàng</h1>
+        <p>Điền thông tin giao hàng, chọn cách thanh toán và xác nhận đơn.</p>
+    </div>
+    <a class="fb-btn fb-btn-soft" href="@Url.Action("Index", "GioHang")"><i class="fas fa-arrow-left"></i> Quay lại giỏ hàng</a>
+</section>
+
+<div class="fb-steps">
+    <div class="fb-step xong"><span class="so"><i class="fas fa-check"></i></span><div><strong>Giỏ hàng</strong><small>Đã chọn @gioHang.Items.Count sản phẩm</small></div></div>
+    <div class="fb-step hien-tai"><span class="so">2</span><div><strong>Thông tin</strong><small>Giao hàng &amp; thanh toán</small></div></div>
+    <div class="fb-step"><span class="so">3</span><div><strong>Hoàn tất</strong><small>Xác nhận đơn</small></div></div>
+</div>
+
+@using (Html.BeginForm("XacNhanDatHang", "DonHang", FormMethod.Post, new { id = "formThanhToan" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="fb-checkout">
+        <div style="min-width: 0;">
+            <!-- 2. THÔNG TIN NGƯỜI NHẬN -->
+            <section class="fb-card fb-card-pad mb-4">
+                <div class="fb-box-head">
+                    <h3>Thông tin người nhận</h3>
+                    <span class="fb-box-icon"><i class="fas fa-user"></i></span>
+                </div>
+                <div class="fb-field">
+                    @Html.LabelFor(m => m.HoTenNguoiNhan)
+                    <div class="fb-input-icon">
+                        <i class="far fa-user"></i>
+                        @Html.TextBoxFor(m => m.HoTenNguoiNhan, new { @class = "fb-control", placeholder = "Nguyễn Văn A", autocomplete = "name" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.HoTenNguoiNhan)
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6 fb-field">
+                        @Html.LabelFor(m => m.SoDienThoai)
+                        <div class="fb-input-icon">
+                            <i class="fas fa-phone"></i>
+                            @Html.TextBoxFor(m => m.SoDienThoai, new { @class = "fb-control", placeholder = "0901234567", inputmode = "tel", autocomplete = "tel" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.SoDienThoai)
+                    </div>
+                    <div class="col-md-6 fb-field">
+                        <label for="Email">Email <small class="text-muted">(không bắt buộc)</small></label>
+                        <div class="fb-input-icon">
+                            <i class="far fa-envelope"></i>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "fb-control", placeholder = "ban@gmail.com", type = "email", autocomplete = "email" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Email)
+                    </div>
+                </div>
+                <div class="fb-field mb-0">
+                    <label for="GhiChu">Ghi chú <small class="text-muted">(không bắt buộc)</small></label>
+                    <div class="fb-input-icon textarea">
+                        <i class="far fa-comment-dots"></i>
+                        @Html.TextAreaFor(m => m.GhiChu, new { @class = "fb-control", rows = 2, placeholder = "Ví dụ: giao giờ hành chính, gọi trước khi giao..." })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.GhiChu)
+                </div>
+            </section>
+
+            <!-- 3. ĐỊA CHỈ GIAO HÀNG: chọn tỉnh -> phường (dữ liệu assets/js/diachi-vn.js) -->
+            <section class="fb-card fb-card-pad mb-4">
+                <div class="fb-box-head">
+                    <h3>Địa chỉ giao hàng</h3>
+                    <span class="fb-box-icon"><i class="fas fa-map-marker-alt"></i></span>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6 fb-field">
+                        @Html.LabelFor(m => m.TinhThanh)
+                        @Html.DropDownListFor(m => m.TinhThanh,
+                                 new SelectList(string.IsNullOrEmpty(Model.TinhThanh) ? new string[0] : new[] { Model.TinhThanh }, Model.TinhThanh),
+                                 "Chọn tỉnh / thành phố", new { @class = "fb-control" })
+                        @Html.ValidationMessageFor(m => m.TinhThanh)
+                    </div>
+                    <div class="col-md-6 fb-field">
+                        @Html.LabelFor(m => m.PhuongXa)
+                        @Html.DropDownListFor(m => m.PhuongXa,
+                                 new SelectList(string.IsNullOrEmpty(Model.PhuongXa) ? new string[0] : new[] { Model.PhuongXa }, Model.PhuongXa),
+                                 "Chọn phường / xã", new { @class = "fb-control" })
+                        @Html.ValidationMessageFor(m => m.PhuongXa)
+                    </div>
+                </div>
+                <div class="fb-field">
+                    @Html.LabelFor(m => m.DiaChiGiao)
+                    <div class="fb-input-icon">
+                        <i class="fas fa-home"></i>
+                        @Html.TextBoxFor(m => m.DiaChiGiao, new { @class = "fb-control", placeholder = "Số nhà, tên đường, tòa nhà...", autocomplete = "street-address" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DiaChiGiao)
+                </div>
+                <div class="fb-note-box">
+                    <b><i class="fas fa-truck"></i> Phí vận chuyển</b>
+                    <ul>
+                        <li>TP. Hồ Chí Minh: @CauHinhVanChuyen.PHI_NOI_THANH.ToString("#,##0")đ</li>
+                        <li>Các tỉnh/thành khác: @CauHinhVanChuyen.PHI_TINH_KHAC.ToString("#,##0")đ</li>
+                        <li>Miễn phí cho đơn có tạm tính từ @CauHinhVanChuyen.MIEN_PHI_TU.ToString("#,##0")đ</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 4. PHƯƠNG THỨC THANH TOÁN -->
+            <section class="fb-card fb-card-pad">
+                <div class="fb-box-head">
+                    <h3>Phương thức thanh toán</h3>
+                    <span class="fb-box-icon"><i class="fas fa-wallet"></i></span>
+                </div>
+                <label class="fb-pay-option @(laQR ? "" : "checked")" for="ttCOD">
+                    @Html.RadioButtonFor(m => m.PhuongThucThanhToan, PhuongThucThanhToan.COD, new { id = "ttCOD" })
+                    <span class="ico"><i class="fas fa-money-bill-wave"></i></span>
+                    <span><strong>Thanh toán khi nhận hàng (COD)</strong><small>Trả tiền mặt cho shipper khi nhận trái cây</small></span>
+                </label>
+                <label class="fb-pay-option @(laQR ? "checked" : "")" for="ttQR">
+                    @Html.RadioButtonFor(m => m.PhuongThucThanhToan, PhuongThucThanhToan.QR, new { id = "ttQR" })
+                    <span class="ico"><i class="fas fa-qrcode"></i></span>
+                    <span><strong>Chuyển khoản bằng mã QR</strong><small>Quét bằng app ngân hàng hoặc ví điện tử; mã QR có sẵn số tiền, hiện ngay sau khi đặt</small></span>
+                </label>
+                @Html.ValidationMessageFor(m => m.PhuongThucThanhToan)
+            </section>
+        </div>
+
+        <!-- 5. TÓM TẮT ĐƠN (dính khi cuộn) -->
+        <aside class="fb-card fb-card-pad fb-sticky">
+            <div class="fb-box-head">
+                <h3>Đơn hàng của bạn</h3>
+                <span class="fb-box-icon"><i class="fas fa-shopping-bag"></i></span>
+            </div>
+
+            <div>
+                @foreach (var item in gioHang.Items)
+                {
+                    <div class="fb-order-line">
+                        <img src="~/assets/img/products/@item.HinhAnh" alt="" />
+                        <div><b>@item.TenSanPham</b><small>@item.SoLuong kg × @item.Gia.ToString("#,##0")đ</small></div>
+                        <span class="font-weight-bold fb-num">@item.ThanhTien.ToString("#,##0")đ</span>
+                    </div>
+                }
+            </div>
+
+            <div class="fb-field mt-3 mb-2">
+                <label for="MaGiamGia">Mã giảm giá</label>
+                <div class="fb-coupon">
+                    @Html.TextBoxFor(m => m.MaGiamGia, new { @class = "fb-control", placeholder = "Nhập mã", autocomplete = "off" })
+                    <button type="button" class="fb-btn fb-btn-soft" id="btnApMa">Áp dụng</button>
+                </div>
+                @Html.ValidationMessageFor(m => m.MaGiamGia)
+                <div class="fb-coupon-msg @(tinhTien.MaApDung != null ? "ok" : "loi")" id="thongBaoMa" role="status">@(ViewData.ModelState.IsValidField("MaGiamGia") ? tinhTien.ThongBaoMa : "")</div>
+                @if (maGoiY.Any())
+                {
+                    <div class="fb-coupon-list" aria-label="Mã đang có">
+                        @foreach (var ma in maGoiY)
+                        {
+                            <button type="button" data-ma="@ma.Ma" title="@ma.MoTaGiaTri, đơn từ @ma.DonToiThieu.ToString("#,##0")đ">@ma.Ma</button>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="fb-sum-row"><span>Tạm tính</span><span id="tamTinh">@tinhTien.TamTinh.ToString("#,##0")đ</span></div>
+            <div class="fb-sum-row"><span>Phí vận chuyển</span><span id="phiShip">@(chuaTinhShip ? "Chọn tỉnh để tính" : (tinhTien.PhiVanChuyen == 0 ? "Miễn phí" : tinhTien.PhiVanChuyen.ToString("#,##0") + "đ"))</span></div>
+            <div class="fb-sum-row giam"><span>Giảm giá</span><span id="giamGia">@(tinhTien.GiamGia > 0 ? "-" + tinhTien.GiamGia.ToString("#,##0") + "đ" : "0đ")</span></div>
+            <div class="fb-sum-total"><span class="font-weight-bold">Tổng thanh toán</span><strong id="tongTien">@tinhTien.TongTien.ToString("#,##0")đ</strong></div>
+
+            <div class="fb-freeship mt-3" id="hopFreeship" @(tinhTien.ConThieuMienPhiShip > 0 ? "" : "hidden")>
+                <i class="fas fa-truck"></i> Mua thêm <b id="conThieu">@tinhTien.ConThieuMienPhiShip.ToString("#,##0")đ</b> để được miễn phí giao hàng.
+            </div>
+
+            <button type="submit" class="fb-btn fb-btn-grad fb-btn-lg fb-btn-block mt-3" id="btnDatHang">
+                Đặt hàng <i class="fas fa-arrow-right"></i>
+            </button>
+            <a class="fb-btn fb-btn-soft fb-btn-block mt-2" href="@Url.Action("Index", "GioHang")"><i class="fas fa-arrow-left"></i> Sửa giỏ hàng</a>
+            <p class="text-muted text-center mt-3 mb-0" style="font-size: .78rem;">Bấm “Đặt hàng” nghĩa là bạn đồng ý với <a href="@Url.Action("DoiTra", "Home")" target="_blank">chính sách đổi trả</a> của FruitBen.</p>
+        </aside>
+    </div>
+}
+
+@section scripts {
+    <script src="~/assets/js/diachi-vn.js"></script>
+    <script>
+        window.FB_THANH_TOAN = { urlTinhTien: "@Url.Action("TinhTien", "DonHang")" };
+    </script>
+    <script src="~/assets/js/thanhtoan.js"></script>
+    <script>
+          $(document).ready(function () {
+              $('#MaGiamGia').on('input propertychange', function () {
+                if ($(this).val().trim() === '') {
+                   $('#thongBaoMa').text('').removeClass('loi ok');
+                   $('span[data-valmsg-for="MaGiamGia"]').text('').removeClass('field-validation-error').addClass('field-validation-valid');
+                }
+                });
+              });
+    </script>
+}

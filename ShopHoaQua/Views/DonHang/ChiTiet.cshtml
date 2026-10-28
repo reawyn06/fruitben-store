@@ -1,0 +1,84 @@
+@model ShopHoaQua.Models.DonHang
+@using ShopHoaQua.Models
+@{
+    ViewBag.TieuDeTrang = "Đơn " + Model.MaHienThi;
+    ViewBag.Banner = "Theo dõi đơn hàng";          
+    ViewBag.BannerTieuDe = "Chi tiết đơn hàng";
+    var daHuy = Model.TrangThai == TrangThaiDonHang.DaHuy;
+    var buoc = Model.TrangThai == TrangThaiDonHang.HoanThanh ? 3 : (Model.TrangThai == TrangThaiDonHang.DangGiao ? 2 : 1);
+    var canChuyenKhoan = Model.PhuongThucThanhToan == PhuongThucThanhToan.QR && !Model.DaThanhToan && !daHuy;
+}
+
+<nav class="fb-breadcrumb" aria-label="Đường dẫn">
+    <a href="@Url.Action("Index", "Home")">Trang chủ</a> <i class="fas fa-chevron-right"></i>
+    <a href="@Url.Action("LichSu", "DonHang")">Đơn hàng của tôi</a> <i class="fas fa-chevron-right"></i>
+    <span class="hien-tai">@Model.MaHienThi</span>
+</nav>
+
+<div class="fb-checkout">
+    <div style="min-width: 0;">
+        <section class="fb-card fb-card-pad">
+            <div class="fb-box-head">
+                <div>
+                    <span class="fb-eyebrow">Theo dõi đơn hàng</span>
+                    <h1 style="font-size: 1.8rem; margin: 10px 0 4px;">Đơn @Model.MaHienThi</h1>
+                    <span class="text-muted" style="font-size: .88rem;">Đặt lúc @Model.NgayDat.ToString("HH:mm dd/MM/yyyy")@(Model.NgayCapNhat.HasValue ? " · Cập nhật " + Model.NgayCapNhat.Value.ToString("HH:mm dd/MM/yyyy") : "")</span>
+                </div>
+                @Html.Partial("_TrangThaiDon", Model.TrangThai)
+            </div>
+
+            @if (daHuy)
+            {
+                <div class="fb-note-box" style="background: var(--fb-red-soft); border-left-color: var(--fb-red); color: var(--fb-red); font-weight: 600;">
+                    <i class="fas fa-times-circle"></i> Đơn hàng đã được huỷ. Nếu bạn đã chuyển khoản, FruitBen sẽ liên hệ để hoàn tiền.
+                </div>
+            }
+            else
+            {
+                <ol class="fb-timeline mt-2">
+                    <li class="xong"><i class="fas fa-clipboard-list"></i>Đã đặt hàng</li>
+                    <li class="@(buoc >= 2 ? "xong" : "")"><i class="fas fa-truck"></i>Đang giao</li>
+                    <li class="@(buoc >= 3 ? "xong" : "")"><i class="fas fa-check"></i>Hoàn thành</li>
+                </ol>
+            }
+
+            @if (Model.TrangThai == TrangThaiDonHang.ChoXuLy)
+            {
+                <div class="d-flex justify-content-between align-items-center flex-wrap mt-4 pt-3" style="gap: 10px; border-top: 1px solid var(--fb-border);">
+                    <span class="text-muted" style="font-size: .88rem;">Đơn chưa được xử lý, bạn có thể tự huỷ.</span>
+                    <button type="button" class="fb-btn fb-btn-danger" data-toggle="modal" data-target="#modalHuyDon"><i class="fas fa-times"></i> Huỷ đơn</button>
+                </div>
+            }
+        </section>
+
+        @if (canChuyenKhoan)
+        {
+            @Html.Partial("_ThanhToanQR", Model)
+        }
+    </div>
+
+    <aside class="fb-card fb-card-pad fb-sticky">
+        @Html.Partial("_TomTatDon", Model)
+    </aside>
+</div>
+
+@if (Model.TrangThai == TrangThaiDonHang.ChoXuLy)
+{
+    <div class="modal fade fb-modal" id="modalHuyDon" tabindex="-1" role="dialog" aria-labelledby="tieuDeHuy" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="fb-modal-icon"><i class="fas fa-times"></i></div>
+                <h3 id="tieuDeHuy">Huỷ đơn @Model.MaHienThi?</h3>
+                <p>Trái cây trong đơn sẽ được trả lại kho@(string.IsNullOrEmpty(Model.MaGiamGiaApDung) ? "" : ", mã " + Model.MaGiamGiaApDung + " được hoàn lượt dùng").</p>
+                @using (Html.BeginForm("HuyDon", "DonHang", new { id = Model.DonHangId }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="fb-modal-actions">
+                        <button type="button" class="fb-btn fb-btn-outline" data-dismiss="modal">Giữ đơn</button>
+                        <button type="submit" class="fb-btn fb-btn-danger">Huỷ đơn</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,236 @@
+﻿@{
+    // Chương 4.1.2 Session: đọc thông tin đăng nhập + giỏ hàng để hiển thị trên header
+    var hoTenDangNhap = Session["HoTen"] as string;
+    var laAdmin = ShopHoaQua.Helpers.PhienDangNhap.LaAdmin(Session);
+    var gioHang = Session[ShopHoaQua.Controllers.GioHangController.SESSION_KEY] as ShopHoaQua.Models.GioHang;
+    var soLuongGioHang = gioHang != null ? gioHang.TongSoLuong : 0;
+    var tuKhoaHienTai = Request.QueryString["tuKhoa"];
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="FruitBen - trái cây tươi nội địa và nhập khẩu, giao nhanh tận nhà." />
+    <title>@(ViewBag.TieuDeTrang ?? "FruitBen") - FruitBen</title>
+    <link rel="shortcut icon" type="image/png" href="~/assets/img/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/assets/css/all.min.css" />
+    <link rel="stylesheet" href="~/assets/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/site.css")?v=" />
+    @RenderSection("styles", required: false)
+</head>
+<body>
+
+    <!-- ===== HEADER (theo mẫu Fruitkha: nền xanh đen, logo cam, menu chữ trắng) ===== -->
+    <header class="fb-header">
+        <nav class="navbar navbar-expand-xl container">
+            <a class="navbar-brand fb-logo" href="@Url.Action("Index", "Home")" aria-label="FruitBen - Trang chủ">
+                <img src="~/assets/img/logo-fruitben.svg" alt="FruitBen" />
+            </a>
+
+            <div class="d-flex align-items-center d-xl-none" style="gap: 8px;">
+                <a class="fb-icon-btn" href="@Url.Action("Index", "GioHang")" aria-label="Giỏ hàng">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span class="fb-badge-count">@soLuongGioHang</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menuChinh" aria-controls="menuChinh" aria-expanded="false" aria-label="Mở menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="menuChinh">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item" data-nav="/"><a class="nav-link" href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                    <li class="nav-item dropdown" data-nav="/sanpham,/san-pham">
+                        <button class="nav-link dropdown-toggle fb-nav-toggle" type="button" id="menuCuaHang" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Cửa hàng</button>
+                        <ul class="dropdown-menu" aria-labelledby="menuCuaHang">
+                            <li><a class="dropdown-item" href="@Url.Action("Index", "SanPham")">Tất cả sản phẩm</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Index", "SanPham", new { loai = "Trái cây nội địa" })">Trái cây nội địa</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Index", "SanPham", new { loai = "Trái cây nhập khẩu" })">Trái cây nhập khẩu</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Index", "SanPham", new { giamGia = true })">Đang giảm giá</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Index", "SanPham", new { sapXep = "moinhat" })">Hàng mới về</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" data-nav="/tintuc"><a class="nav-link" href="@Url.Action("Index", "TinTuc")">Tin tức</a></li>
+                    <li class="nav-item" data-nav="/home/gioithieu"><a class="nav-link" href="@Url.Action("GioiThieu", "Home")">Giới thiệu</a></li>
+                    <li class="nav-item dropdown" data-nav="/home/thanhtoan,/home/vanchuyen,/home/doitra">
+                        <button class="nav-link dropdown-toggle fb-nav-toggle" type="button" id="menuHoTro" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Hỗ trợ</button>
+                        <ul class="dropdown-menu" aria-labelledby="menuHoTro">
+                            <li><a class="dropdown-item" href="@Url.Action("ThanhToan", "Home")">Hướng dẫn thanh toán</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("VanChuyen", "Home")">Chính sách vận chuyển</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("DoiTra", "Home")">Chính sách đổi trả</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" data-nav="/lienhe"><a class="nav-link" href="@Url.Action("Index", "LienHe")">Liên hệ</a></li>
+                </ul>
+
+                <div class="d-flex align-items-center fb-header-actions" style="gap: 10px;">
+                    <form class="fb-search" action="@Url.Action("Index", "SanPham")" method="get" role="search">
+                        <input type="search" name="tuKhoa" value="@tuKhoaHienTai" placeholder="Tìm trái cây..." aria-label="Tìm trái cây" />
+                        <button type="submit" aria-label="Tìm"><i class="fas fa-search"></i></button>
+                    </form>
+
+                    <a class="fb-icon-btn d-none d-xl-inline-flex" href="@Url.Action("Index", "GioHang")" title="Giỏ hàng" aria-label="Giỏ hàng">
+                        <i class="fas fa-shopping-basket"></i>
+                        <span class="fb-badge-count">@soLuongGioHang</span>
+                    </a>
+
+                    @if (!string.IsNullOrEmpty(hoTenDangNhap))
+                    {
+                        <div class="dropdown">
+                            <button class="fb-btn fb-btn-grad fb-user-btn dropdown-toggle" type="button" id="menuTaiKhoan" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> <span class="fb-user-name">Xin chào, @hoTenDangNhap</span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="menuTaiKhoan">
+                                <a class="dropdown-item" href="@Url.Action("LichSu", "DonHang")"><i class="fas fa-receipt"></i> Đơn hàng của tôi</a>
+                                <a class="dropdown-item" href="@Url.Action("Index", "GioHang")"><i class="fas fa-shopping-basket"></i> Giỏ hàng (@soLuongGioHang kg)</a>
+                                @if (laAdmin)
+                                {
+                                    <a class="dropdown-item" href="@Url.Action("Index", "QuanTri")"><i class="fas fa-shield-alt"></i> Trang quản trị</a>
+                                }
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="@Url.Action("DangXuat", "TaiKhoan")" data-toggle="modal" data-target="#modalDangXuat">
+                                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="fb-btn fb-btn-grad" href="@Url.Action("DangNhap", "TaiKhoan")"><i class="fas fa-user"></i> Đăng nhập</a>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ===== THÔNG BÁO (toast góc phải, tự ẩn) ===== -->
+    <div class="fb-toasts" aria-live="polite">
+        @foreach (var key in new[] { "ThongBao", "ThongBaoThanhCong" })
+        {
+            if (TempData[key] != null)
+            {
+                <div class="fb-toast" role="status">
+                    <span class="fb-toast-icon"><i class="fas fa-check"></i></span>
+                    <div class="fb-toast-body">
+                        @TempData[key]
+                        @if (key == "ThongBaoThanhCong" && TempData["HienNutGioHang"] != null)
+                        {
+                            <div><a class="fb-btn fb-btn-soft fb-btn-sm" href="@Url.Action("Index", "GioHang")">Xem giỏ hàng <i class="fas fa-arrow-right"></i></a></div>
+                        }
+                    </div>
+                    <button class="fb-toast-close" type="button" aria-label="Đóng">&times;</button>
+                </div>
+            }
+        }
+        @if (TempData["ThongBaoLoi"] != null)
+        {
+            <div class="fb-toast loi" role="alert">
+                <span class="fb-toast-icon"><i class="fas fa-exclamation"></i></span>
+                <div class="fb-toast-body">@TempData["ThongBaoLoi"]</div>
+                <button class="fb-toast-close" type="button" aria-label="Đóng">&times;</button>
+            </div>
+        }
+    </div>
+
+    <main class="fb-main">
+        @if (ViewBag.Banner != null)
+        {
+            <!-- Banner đầu trang (breadcrumb-section của mẫu Fruitkha) -->
+            <section class="fb-top-banner">
+                <span class="fb-eyebrow">@ViewBag.Banner</span>
+                <h1>@(ViewBag.BannerTieuDe ?? ViewBag.TieuDeTrang)</h1>
+            </section>
+        }
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- ===== LOGO ĐỐI TÁC (logo-carousel-section của mẫu Fruitkha) ===== -->
+    <section class="fb-logos" aria-label="Đối tác">
+        <div class="container">
+            @for (var i = 1; i <= 5; i++)
+            {
+                <img src="~/assets/img/company-logos/@(i).png" alt="Đối tác @i" />
+            }
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="fb-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <span class="fb-footer-brand">FRUITBEN</span>
+                    <p style="max-width: 34ch;">Trái cây tươi mỗi ngày, tuyển chọn từ nhà vườn VietGAP và nhà nhập khẩu uy tín. Đồ án Lập trình Web – Nhóm 10, ASP.NET MVC.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 col-6 mb-4">
+                    <h4>Mua sắm</h4>
+                    <ul>
+                        <li><a href="@Url.Action("Index", "SanPham", new { loai = "Trái cây nội địa" })">Trái cây nội địa</a></li>
+                        <li><a href="@Url.Action("Index", "SanPham", new { loai = "Trái cây nhập khẩu" })">Trái cây nhập khẩu</a></li>
+                        <li><a href="@Url.Action("Index", "SanPham", new { giamGia = true })">Đang giảm giá</a></li>
+                        <li><a href="@Url.Action("Index", "SanPham", new { sapXep = "moinhat" })">Hàng mới về</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 col-6 mb-4">
+                    <h4>Hỗ trợ</h4>
+                    <ul>
+                        <li><a href="@Url.Action("Index", "LienHe")">Liên hệ</a></li>
+                        <li><a href="@Url.Action("ThanhToan", "Home")">Thanh toán</a></li>
+                        <li><a href="@Url.Action("VanChuyen", "Home")">Vận chuyển</a></li>
+                        <li><a href="@Url.Action("DoiTra", "Home")">Đổi trả</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h4>Liên hệ</h4>
+                    <ul class="fb-contact">
+                        <li><i class="fas fa-map-marker-alt"></i> 140 Lê Trọng Tấn, Phường Tây Thạnh, TP. Hồ Chí Minh</li>
+                        <li><i class="fas fa-phone"></i> 1900 1234 (8:00 – 21:00)</li>
+                        <li><i class="fas fa-envelope"></i> fruitben@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="fb-footer-bottom">
+            <div class="container">
+                Bản quyền &copy; @DateTime.Now.Year FruitBen · Đồ án Lập trình Web <strong>Nhóm 10</strong> ·
+                <a href="@Url.Action("DoiTra", "Home")">Chính sách đổi trả</a> ·
+                <a href="@Url.Action("VanChuyen", "Home")">Vận chuyển</a>
+            </div>
+        </div>
+    </footer>
+
+    @if (!string.IsNullOrEmpty(hoTenDangNhap))
+    {
+        <!-- Modal xác nhận đăng xuất (giống logout modal của SPORTIX) -->
+        <div class="modal fade fb-modal" id="modalDangXuat" tabindex="-1" role="dialog" aria-labelledby="tieuDeDangXuat" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="fb-modal-icon"><i class="fas fa-sign-out-alt"></i></div>
+                    <h3 id="tieuDeDangXuat">Đăng xuất?</h3>
+                    <p>Bạn có chắc muốn đăng xuất khỏi FruitBen không? Giỏ hàng hiện tại sẽ được xoá.</p>
+                    <div class="fb-modal-actions">
+                        <button type="button" class="fb-btn fb-btn-outline" data-dismiss="modal">Ở lại</button>
+                        <a class="fb-btn fb-btn-danger" href="@Url.Action("DangXuat", "TaiKhoan")">Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script src="~/assets/js/jquery-1.11.3.min.js"></script>
+    <!-- Kiểm tra dữ liệu phía trình duyệt dựa trên Data Annotations của Model (ClientValidationEnabled trong Web.config) -->
+    <script src="~/assets/js/jquery.validate.min.js"></script>
+    <script src="~/assets/js/jquery.validate.messages_vi.min.js"></script>
+    <script src="~/assets/js/jquery.validate.unobtrusive.min.js"></script>
+    <!-- Bootstrap 4 bản "bundle" (đã gồm Popper.js) để dropdown, collapse, modal hoạt động -->
+    <script src="~/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/js/site.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

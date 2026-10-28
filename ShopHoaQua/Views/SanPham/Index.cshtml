@@ -1,0 +1,207 @@
+@model ShopHoaQua.Controllers.LocSanPhamViewModel
+@{
+    var hangMoi = ViewBag.HangMoi as List<ShopHoaQua.Models.SanPham>;
+    var dangGiam = ViewBag.DangGiam as List<ShopHoaQua.Models.SanPham>;
+    var giaMax = Math.Ceiling(Model.GiaCaoNhat / 10000m) * 10000m;
+    if (giaMax <= 0) { giaMax = 500000; }
+    var giaDangChon = Model.GiaToiDa ?? giaMax;
+    var dangTim = !string.IsNullOrEmpty(Model.TuKhoa);
+    var giamGiaParam = Model.GiamGia ? (bool?)true : null;
+    string tieuDe = dangTim ? "Kết quả cho “" + Model.TuKhoa + "”" : (!string.IsNullOrEmpty(Model.Loai) ? Model.Loai : (Model.GiamGia ? "Đang giảm giá" : "Tất cả trái cây"));
+}
+
+<!-- 1. ĐẦU TRANG (giống "Sản phẩm thể thao" của SPORTIX) -->
+<section class="fb-card fb-page-head reveal">
+    <div>
+        <span class="fb-eyebrow"><i class="fas fa-store"></i> Cửa hàng FruitBen</span>
+        <h1>Trái cây tươi mỗi ngày</h1>
+        <p>Chọn theo loại, khoảng giá hoặc ưu đãi. Giá niêm yết theo kg, cân đủ, đổi ngay nếu trái không đạt.</p>
+    </div>
+    <img class="fb-page-head-img" src="~/assets/img/banner.jpg" alt="Quầy trái cây FruitBen" />
+</section>
+
+@if (hangMoi != null && hangMoi.Any())
+{
+    <!-- 2. VỪA CẬP BẾN: dải ngang cuộn -->
+    <section class="fb-section reveal">
+        <div class="fb-section-head">
+            <div>
+                <span class="fb-eyebrow">Hàng mới</span>
+                <h2>Vừa cập kho</h2>
+            </div>
+            <div class="fb-strip-btns">
+                <button type="button" data-strip-target="dsHangMoi" data-dir="-1" aria-label="Cuộn trái"><i class="fas fa-chevron-left"></i></button>
+                <button type="button" data-strip-target="dsHangMoi" data-dir="1" aria-label="Cuộn phải"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="fb-strip" id="dsHangMoi">
+            @foreach (var sp in hangMoi)
+            {
+                @Html.Partial("_TheSanPham", sp)
+            }
+        </div>
+    </section>
+}
+
+<!-- 3. BỘ LỌC + DANH SÁCH -->
+<section class="fb-section fb-shop" id="danhSach">
+    <form class="fb-card fb-filter" method="get" action="@Url.Action("Index")#danhSach">
+        @if (dangTim)
+        {
+            <input type="hidden" name="tuKhoa" value="@Model.TuKhoa" />
+        }
+        <div class="fb-filter-head">
+            <span><i class="fas fa-filter" style="color: var(--fb-green);"></i> Bộ lọc</span>
+            @if (Model.DangLoc)
+            {
+                <a href="@Url.Action("Index")#danhSach"><i class="fas fa-undo-alt"></i> Xoá lọc</a>
+            }
+        </div>
+
+        <div class="fb-filter-group">
+            <label class="fb-label"><i class="fas fa-th-large"></i> Danh mục</label>
+            <div class="fb-chip-list">
+                <label class="fb-chip @(string.IsNullOrEmpty(Model.Loai) ? "active" : "")">
+                    <input type="radio" name="loai" value="" class="d-none" data-auto-apply @(string.IsNullOrEmpty(Model.Loai) ? "checked" : "") /> Tất cả
+                </label>
+                @foreach (var loai in Model.DanhSachLoai)
+                {
+                    var chon = string.Equals(loai, Model.Loai, StringComparison.OrdinalIgnoreCase);
+                    <label class="fb-chip @(chon ? "active" : "")">
+                        <input type="radio" name="loai" value="@loai" class="d-none" data-auto-apply @(chon ? "checked" : "") /> @loai
+                    </label>
+                }
+            </div>
+        </div>
+
+        <div class="fb-filter-group">
+            <label class="fb-label d-flex justify-content-between" for="giaToiDa">
+                <span><i class="fas fa-tags"></i> Giá tối đa / kg</span>
+                <span class="fb-range-value" id="nhanGia">@giaDangChon.ToString("#,##0")đ</span>
+            </label>
+            <input type="range" class="fb-range" id="giaToiDa" name="giaToiDa" min="10000" max="@giaMax.ToString("0")" step="10000" value="@giaDangChon.ToString("0")" data-range-label="nhanGia" />
+            <div class="d-flex justify-content-between" style="font-size: .75rem; color: var(--fb-muted);"><span>10.000đ</span><span>@giaMax.ToString("#,##0")đ</span></div>
+            <button type="submit" class="fb-btn fb-btn-soft fb-btn-sm fb-btn-block mt-2">Áp dụng giá</button>
+        </div>
+
+        <div class="fb-filter-group">
+            <label class="fb-label" for="sapXep"><i class="fas fa-sort-amount-down"></i> Sắp xếp</label>
+            <select id="sapXep" name="sapXep" class="fb-control" data-auto-apply>
+                @foreach (var cach in ShopHoaQua.Controllers.LocSanPhamViewModel.CACH_SAP_XEP)
+                {
+                    <option value="@cach.Key" @((Model.SapXep ?? "macdinh") == cach.Key ? "selected" : "")>@cach.Value</option>
+                }
+            </select>
+        </div>
+
+        <div class="fb-filter-group">
+            <label class="fb-check" for="giamGia">
+                <input type="checkbox" id="giamGia" name="giamGia" value="true" data-auto-apply @(Model.GiamGia ? "checked" : "") />
+                <span><i class="fas fa-fire" style="color: var(--fb-red);"></i> Chỉ hàng đang giảm giá</span>
+            </label>
+        </div>
+    </form>
+
+    <div style="min-width: 0;">
+        @if (dangGiam != null && dangGiam.Any())
+        {
+            <div class="fb-card fb-sale-box reveal">
+                <h3><i class="fas fa-fire"></i> Đang giảm giá</h3>
+                <div class="fb-products cot-3">
+                    @foreach (var sp in dangGiam.Take(3))
+                    {
+                        @Html.Partial("_TheSanPham", sp)
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="fb-toolbar">
+            <div class="mr-auto">
+                <span class="fb-eyebrow">@(dangTim ? "Tìm kiếm" : "Danh sách sản phẩm")</span>
+                <h2>@tieuDe</h2>
+            </div>
+            <span class="fb-count-pill"><i class="fas fa-apple-alt" style="color: var(--fb-green);"></i> <b>@Model.TongSo</b> sản phẩm</span>
+        </div>
+
+        @if (Model.DangLoc)
+        {
+            <div class="fb-active-filters">
+                @if (dangTim)
+                {
+                    <a href="@Url.Action("Index", new { loai = Model.Loai, giaToiDa = Model.GiaToiDa, sapXep = Model.SapXep, giamGia = giamGiaParam })">Từ khoá: @Model.TuKhoa <i class="fas fa-times"></i></a>
+                }
+                @if (!string.IsNullOrEmpty(Model.Loai))
+                {
+                    <a href="@Url.Action("Index", new { tuKhoa = Model.TuKhoa, giaToiDa = Model.GiaToiDa, sapXep = Model.SapXep, giamGia = giamGiaParam })">@Model.Loai <i class="fas fa-times"></i></a>
+                }
+                @if (Model.GiaToiDa.HasValue)
+                {
+                    <a href="@Url.Action("Index", new { tuKhoa = Model.TuKhoa, loai = Model.Loai, sapXep = Model.SapXep, giamGia = giamGiaParam })">Đến @Model.GiaToiDa.Value.ToString("#,##0")đ <i class="fas fa-times"></i></a>
+                }
+                @if (Model.GiamGia)
+                {
+                    <a href="@Url.Action("Index", new { tuKhoa = Model.TuKhoa, loai = Model.Loai, giaToiDa = Model.GiaToiDa, sapXep = Model.SapXep })">Đang giảm giá <i class="fas fa-times"></i></a>
+                }
+            </div>
+        }
+
+        @if (!Model.DanhSach.Any())
+        {
+            <div class="fb-card fb-empty">
+                <i class="fas fa-search"></i>
+                <h3>Không tìm thấy trái cây phù hợp</h3>
+                <p>Thử bỏ bớt bộ lọc hoặc tìm bằng từ khoá khác, ví dụ “táo”, “nho”, “nhập khẩu”.</p>
+                <a class="fb-btn fb-btn-grad mt-2" href="@Url.Action("Index")">Xem tất cả sản phẩm</a>
+            </div>
+        }
+        else
+        {
+            <div class="fb-products cot-3">
+                @foreach (var sp in Model.DanhSach)
+                {
+                    @Html.Partial("_TheSanPham", sp)
+                }
+            </div>
+        }
+
+        @if (Model.TongSoTrang > 1)
+        {
+            <ul class="fb-pagination" aria-label="Phân trang">
+                <li class="@(Model.Trang <= 1 ? "disabled" : "")">
+                    @if (Model.Trang > 1)
+                    {
+                        <a href="@Url.Action("Index", new { tuKhoa = Model.TuKhoa, loai = Model.Loai, giaToiDa = Model.GiaToiDa, sapXep = Model.SapXep, giamGia = giamGiaParam, trang = Model.Trang - 1 })#danhSach" aria-label="Trang trước"><i class="fas fa-chevron-left"></i></a>
+                    }
+                    else
+                    {
+                        <span><i class="fas fa-chevron-left"></i></span>
+                    }
+                </li>
+                @for (int i = 1; i <= Model.TongSoTrang; i++)
+                {
+                    <li class="@(i == Model.Trang ? "active" : "")">
+                        @if (i == Model.Trang)
+                        {
+                            <span aria-current="page">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", new { tuKhoa = Model.TuKhoa, loai = Model.Loai, giaToiDa = Model.GiaToiDa, sapXep = Model.SapXep, giamGia = giamGiaParam, trang = i })#danhSach">@i</a>
+                        }
+                    </li>
+                }
+                <li class="@(Model.Trang >= Model.TongSoTrang ? "disabled" : "")">
+                    @if (Model.Trang < Model.TongSoTrang)
+                    {
+                        <a href="@Url.Action("Index", new { tuKhoa = Model.TuKhoa, loai = Model.Loai, giaToiDa = Model.GiaToiDa, sapXep = Model.SapXep, giamGia = giamGiaParam, trang = Model.Trang + 1 })#danhSach" aria-label="Trang sau"><i class="fas fa-chevron-right"></i></a>
+                    }
+                    else
+                    {
+                        <span><i class="fas fa-chevron-right"></i></span>
+                    }
+                </li>
+            </ul>
+        }
+    </div>
+</section>

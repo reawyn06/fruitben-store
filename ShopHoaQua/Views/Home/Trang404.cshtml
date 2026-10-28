@@ -1,0 +1,20 @@
+@{
+    ViewBag.TieuDeTrang = "Không tìm thấy trang";
+    ViewBag.Banner = "Lỗi 404";         
+    ViewBag.BannerTieuDe = "Không tìm thấy trang";
+}
+
+<section class="fb-card fb-empty" style="padding: 70px 20px;">
+    <i class="fas fa-apple-alt"></i>
+    <span class="fb-eyebrow d-block mx-auto mb-2" style="width: max-content;">Lỗi 404</span>
+    <h1 style="font-size: clamp(1.8rem, 4vw, 2.6rem);">Trang này không có trái nào</h1>
+    <p>Đường dẫn có thể đã bị đổi hoặc sản phẩm không còn bán. Thử tìm trái cây bạn cần nhé.</p>
+    <form class="fb-search d-inline-block my-3" action="@Url.Action("Index", "SanPham")" method="get" role="search">
+        <input type="search" name="tuKhoa" placeholder="Tìm trái cây..." aria-label="Tìm trái cây" style="width: min(320px, 80vw);" />
+        <button type="submit" aria-label="Tìm"><i class="fas fa-search"></i></button>
+    </form>
+    <div class="d-flex justify-content-center flex-wrap" style="gap: 10px;">
+        <a class="fb-btn fb-btn-grad" href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i> Về trang chủ</a>
+        <a class="fb-btn fb-btn-soft" href="@Url.Action("Index", "SanPham")">Đi tới cửa hàng</a>
+    </div>
+</section>
